@@ -131,3 +131,25 @@ TEST_F(StringTest, rstripTest) {
     ASSERT_EQ(0, std::strcmp("text", testedString.c_str()))
                                 << "verified str: " << testedString.c_str();
 }
+
+TEST_F(StringTest, lstripTest) {
+    String testedString("   text");
+    ASSERT_EQ(7, testedString.size());
+    ASSERT_EQ(0, std::strcmp("   text", testedString.c_str()))
+                                << "verified str: " << testedString.c_str();
+    testedString.lstrip();
+    ASSERT_EQ(4, testedString.size());
+    ASSERT_EQ(0, std::strcmp("text", testedString.c_str()))
+                                << "verified str: " << testedString.c_str();
+}
+
+TEST_F(StringTest, stripTest) {
+    String testedString("   text    ");
+    ASSERT_EQ(11, testedString.size());
+    ASSERT_EQ(0, std::strcmp("   text    ", testedString.c_str()))
+                                << "verified str: " << testedString.c_str();
+    testedString.strip();
+    ASSERT_EQ(4, testedString.size());
+    ASSERT_EQ(0, std::strcmp("text", testedString.c_str()))
+                                << "verified str: " << testedString.c_str();
+}

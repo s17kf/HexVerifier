@@ -112,4 +112,23 @@ namespace utils {
         }
     }
 
+    void String::lstrip() {
+        size_t firstNotSpaceIndex = 0;
+        while (firstNotSpaceIndex < size() && mStr[firstNotSpaceIndex] == ' ') {
+            ++firstNotSpaceIndex;
+        }
+        if (firstNotSpaceIndex == 0)
+            return;
+        mSize -= firstNotSpaceIndex;
+        char *oldStr = mStr;
+        mStr = new char[mCapacity + 1];
+        strncpy(mStr, &oldStr[firstNotSpaceIndex], mSize + 1);
+        delete[] oldStr;
+    }
+
+    void String::strip() {
+        rstrip();
+        lstrip();
+    }
+
 } // utils

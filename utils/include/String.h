@@ -44,6 +44,10 @@ namespace utils {
 
         void rstrip();
 
+        void lstrip();
+
+        void strip();
+
     private:
         size_t mSize;
         size_t mCapacity;
