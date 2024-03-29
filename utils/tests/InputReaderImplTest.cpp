@@ -66,4 +66,5 @@ TEST_F(InputReaderImplTest, getlineReturnsStrippedLine) {
                                     << "loopCounter=" << loopCounter << ": "
                                     << "expected: '" << expectedLine << "', tested: '" << testedLine->c_str() << "'";
     }
+    fclose(sampleBoard1File);
 }

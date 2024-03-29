@@ -17,7 +17,7 @@ namespace utils {
             throw std::ios_base::failure("getline error");
         }
         auto *result = new String(lineRaw);
-        delete lineRaw;
+        free(lineRaw);
         result->rstrip('\n');
         result->strip();
         return result;
