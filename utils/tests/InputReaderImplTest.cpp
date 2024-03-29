@@ -7,13 +7,9 @@
 #include <sstream>
 #include <fstream>
 #include "InputReaderImpl.h"
-//#include <cstdio>
-//#include "CinMock.h"
 
 
 using utils::InputReaderImpl;
-using utils::String;
-
 class InputReaderImplTest : public ::testing::Test {
 protected:
     InputReaderImplTest() {
@@ -56,6 +52,8 @@ private:
         fileStream.close();
     }
 };
+
+using utils::String;
 
 TEST_F(InputReaderImplTest, getlineReturnsStrippedLine) {
     FILE *sampleBoard1File = std::fopen(SAMPLE_FILENAME.c_str(), "r");
