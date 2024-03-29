@@ -42,11 +42,11 @@ namespace utils {
             return mStr[index];
         }
 
-        void rstrip();
+        String& rstrip(char c = ' ');
 
-        void lstrip();
+        String& lstrip(char c = ' ');
 
-        void strip();
+        String& strip(char c = ' ');
 
     private:
         size_t mSize;

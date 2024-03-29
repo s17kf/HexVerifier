@@ -11,12 +11,15 @@ include_directories(
 
 set(MAIN_SOURCES
         utils/src/String.cpp
+        utils/src/InputReaderImpl.cpp
 )
 
 set(UTILS_TEST_SOURCES
         tests_main.cpp
         utils/src/String.cpp
+        utils/src/InputReaderImpl.cpp
         utils/tests/StringTest.cpp
+        utils/tests/InputReaderImplTest.cpp
 )
 
 

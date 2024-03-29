@@ -103,32 +103,33 @@ namespace utils {
         return *this;
     }
 
-    void String::rstrip() {
+    String& String::rstrip(char c) {
         int current = size() - 1;
-        while (current >= 0 && mStr[current] == ' ') {
+        while (current >= 0 && mStr[current] == c) {
             mStr[current] = '\0';
             --mSize;
             --current;
         }
+        return *this;
     }
 
-    void String::lstrip() {
+    String& String::lstrip(char c) {
         size_t firstNotSpaceIndex = 0;
-        while (firstNotSpaceIndex < size() && mStr[firstNotSpaceIndex] == ' ') {
+        while (firstNotSpaceIndex < size() && mStr[firstNotSpaceIndex] == c) {
             ++firstNotSpaceIndex;
         }
         if (firstNotSpaceIndex == 0)
-            return;
+            return *this;
         mSize -= firstNotSpaceIndex;
         char *oldStr = mStr;
         mStr = new char[mCapacity + 1];
         strncpy(mStr, &oldStr[firstNotSpaceIndex], mSize + 1);
         delete[] oldStr;
+        return *this;
     }
 
-    void String::strip() {
-        rstrip();
-        lstrip();
+    String& String::strip(char c) {
+        return rstrip(c).lstrip(c);
     }
 
 } // utils
