@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 23)
 
 include_directories(
         utils/include
-        board/include
         dataStructures/include
         googletest/googletest/include
         googletest/googlemock/include)
@@ -26,8 +25,6 @@ set(UTILS_TEST_SOURCES
 
 set(BOARD_TEST_SOURCES
         tests_main.cpp
-        board/src/Cell.cpp
-        board/tests/CellTest.cpp
 )
 
 set(DATA_STRUCTURES_TEST_SOURCES
