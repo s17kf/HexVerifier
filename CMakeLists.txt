@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 23)
 
 include_directories(
         utils/include
+        board/include
         dataStructures/include
         googletest/googletest/include
         googletest/googlemock/include)
@@ -25,6 +26,9 @@ set(UTILS_TEST_SOURCES
 
 set(BOARD_TEST_SOURCES
         tests_main.cpp
+        board/src/Cell.cpp
+        board/src/Board.cpp
+        board/tests/BoardTest.cpp
 )
 
 set(DATA_STRUCTURES_TEST_SOURCES
@@ -32,6 +36,7 @@ set(DATA_STRUCTURES_TEST_SOURCES
         dataStructures/tests/ListTest.cpp
         dataStructures/tests/StackTest.cpp
         dataStructures/tests/QueueTest.cpp
+        dataStructures/tests/VectorTest.cpp
 )
 
 add_executable(Hex main.cpp ${MAIN_SOURCES})
