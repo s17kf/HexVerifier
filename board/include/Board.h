@@ -13,6 +13,7 @@ namespace board {
     class Board {
     public:
         typedef data_structures::Vector<Cell *> RowType;
+        typedef Cell::Type CellType;
 
         explicit Board(size_t mSize);
 
@@ -32,10 +33,19 @@ namespace board {
 
         const Cell &getBoarder(Cell::Type type) const;
 
+        void setType(size_t row, size_t cellNum, CellType type);
+
+        size_t getColorCount(Cell::Type color);
+
     private:
+        void incColorCount(Cell::Type color);
+
+        void decColorCount(Cell::Type color);
         inline static void createConnection(Cell* c1, Cell* c2);
 
         size_t mSize;
+        size_t redCellsCount;
+        size_t blueCellsCount;
         Cell mRedBoarderLeft;
         Cell mRedBoarderRight;
         Cell mBlueBoarderLeft;

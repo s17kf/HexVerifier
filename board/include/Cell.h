@@ -27,8 +27,8 @@ namespace board {
             return mType;
         }
 
-        void setType(Type mType) {
-            Cell::mType = mType;
+        void setType(Type type) {
+            Cell::mType = type;
         }
 
         constexpr const data_structures::List<Cell *> &getNeighbours() const {

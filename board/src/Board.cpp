@@ -9,6 +9,8 @@ using data_structures::Vector;
 namespace board {
 
     Board::Board(size_t size) : mSize(size),
+                                redCellsCount(0),
+                                blueCellsCount(0),
                                 mRedBoarderLeft(Cell::Type::redBorderLeft),
                                 mRedBoarderRight(Cell::Type::redBorderRight),
                                 mBlueBoarderLeft(Cell::Type::blueBorderLeft),
@@ -110,6 +112,56 @@ namespace board {
     void Board::createConnection(Cell *c1, Cell *c2) {
         c1->addNeighbour(c2);
         c2->addNeighbour(c1);
+    }
+
+    void Board::setType(size_t row, size_t cellNum, Board::CellType type) {
+        if (type > Cell::Type::blue) {
+            throw std::invalid_argument("Try to set not allowed type of cell (boarder type used)!");
+        }
+        if (getCell(row, cellNum)->getType() != Cell::Type::empty)
+            decColorCount(getCell(row, cellNum)->getType());
+        if (type != Cell::Type::empty)
+            incColorCount(type);
+
+        mBoard[row]->at(cellNum)->setType(type);
+    }
+
+    size_t Board::getColorCount(Cell::Type color) {
+        switch (color) {
+            case Cell::Type::red:
+                return redCellsCount;
+            case Cell::Type::blue:
+                return blueCellsCount;
+            default:
+                throw std::invalid_argument("Try to get count of not allowed type of cell!");
+        }
+    }
+
+    void Board::incColorCount(Cell::Type color) {
+        switch (color) {
+            case Cell::Type::red:
+                ++redCellsCount;
+                return;
+            case Cell::Type::blue:
+                ++blueCellsCount;
+                return;
+            default:
+                throw std::invalid_argument("Try to increment count of not allowed type of cell!");
+        }
+    }
+
+    void Board::decColorCount(Cell::Type color) {
+        switch (color) {
+            case Cell::Type::red:
+                --redCellsCount;
+                return;
+            case Cell::Type::blue:
+                --blueCellsCount;
+                return;
+            default:
+                throw std::invalid_argument("Try to decrement count of not allowed type of cell!");
+        }
+
     }
 
 } // board

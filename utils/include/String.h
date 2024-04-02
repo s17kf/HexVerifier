@@ -38,11 +38,11 @@ namespace utils {
 
         String operator+=(int number);
 
-        [[nodiscard]] constexpr const char *c_str() const { return mStr; }
+        [[nodiscard]] inline const char *c_str() const { return mStr; }
 
-        [[nodiscard]] constexpr char operator[](unsigned int index) {
-            return mStr[index];
-        }
+        [[nodiscard]] inline char operator[](unsigned int index) { return mStr[index]; }
+
+        [[nodiscard]] inline char last() { return mStr[mSize - 1]; }
 
         bool operator==(const String &other) const { return 0 == strcmp(mStr, other.mStr); }
 

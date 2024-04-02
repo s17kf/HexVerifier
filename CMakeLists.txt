@@ -26,9 +26,12 @@ set(UTILS_TEST_SOURCES
 
 set(BOARD_TEST_SOURCES
         tests_main.cpp
+        utils/src/String.cpp
         board/src/Cell.cpp
         board/src/Board.cpp
+        board/src/BoardParser.cpp
         board/tests/BoardTest.cpp
+        board/tests/BoardParserTest.cpp
 )
 
 set(DATA_STRUCTURES_TEST_SOURCES
