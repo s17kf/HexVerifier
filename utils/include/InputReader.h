@@ -11,6 +11,8 @@ namespace utils {
     class InputReader {
     public:
         virtual String *getLine() = 0;
+
+        virtual bool eof() const = 0;
     };
 
 } // utils

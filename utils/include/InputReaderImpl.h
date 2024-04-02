@@ -8,16 +8,21 @@
 #include "InputReader.h"
 
 #include <istream>
+#include <iostream>
 
 namespace utils {
     class InputReaderImpl : public InputReader {
     public:
-        explicit InputReaderImpl(FILE *input = stdin) : mInput(input) {}
+        explicit InputReaderImpl(std::istream &stream = std::cin) : mStream(stream) {}
+
+        bool eof() const override {
+            return mStream.eof();
+        }
 
         String *getLine() override;
 
     private:
-        FILE *mInput;
+        std::istream &mStream;
     };
 
 } // utils

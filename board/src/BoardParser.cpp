@@ -14,7 +14,7 @@ namespace board {
     Board *BoardParser::generateBoard() {
         String *lastLine = mInputReader.getLine();
         if (*lastLine != BOARD_DELIMITER) {
-            throw std::invalid_argument("Invalid input data!");
+            return nullptr;
         }
         delete lastLine;
         lastLine = mInputReader.getLine();

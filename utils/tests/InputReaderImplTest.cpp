@@ -56,8 +56,11 @@ private:
 using utils::String;
 
 TEST_F(InputReaderImplTest, getlineReturnsStrippedLine) {
-    FILE *sampleBoard1File = std::fopen(SAMPLE_FILENAME.c_str(), "r");
-    InputReaderImpl inputReader(sampleBoard1File);
+    std::stringstream stream;
+    for (const auto &line: SAMPLE_FILE_LINES) {
+        stream << line << std::endl;
+    }
+    InputReaderImpl inputReader(stream);
     size_t loopCounter = 0;
     for (auto &expectedLine: SAMPLE_FILE_LINES_STRIPPED) {
         ++loopCounter;
@@ -66,5 +69,4 @@ TEST_F(InputReaderImplTest, getlineReturnsStrippedLine) {
                                     << "loopCounter=" << loopCounter << ": "
                                     << "expected: '" << expectedLine << "', tested: '" << testedLine->c_str() << "'";
     }
-    fclose(sampleBoard1File);
 }

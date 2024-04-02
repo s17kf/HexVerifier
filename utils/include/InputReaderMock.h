@@ -14,6 +14,7 @@ namespace utils {
     class InputReaderMock : public InputReader {
     public:
         MOCK_METHOD(String *, getLine, (), (override));
+        MOCK_METHOD(bool, eof, (), (const, override));
     };
 
 } // utils

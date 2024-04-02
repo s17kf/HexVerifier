@@ -4,20 +4,13 @@
 
 #include "InputReaderImpl.h"
 
-#include <cstdio>
-#include <ios>
-
 namespace utils {
 
     String *InputReaderImpl::getLine() {
-        char *lineRaw = nullptr;
-        size_t len;
-        if (getline(&lineRaw, &len, mInput) < 0) {
-            delete lineRaw;
-            throw std::ios_base::failure("getline error");
-        }
-        auto *result = new String(lineRaw);
-        free(lineRaw);
+        const size_t maxLen = 100;
+        char line[100];
+        mStream.getline(line, maxLen);
+        auto *result = new String(line);
         result->rstrip('\n');
         result->strip();
         return result;

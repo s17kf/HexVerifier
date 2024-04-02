@@ -44,9 +44,13 @@ namespace utils {
 
         [[nodiscard]] inline char last() { return mStr[mSize - 1]; }
 
-        bool operator==(const String &other) const { return 0 == strcmp(mStr, other.mStr); }
+        inline bool operator==(const String &other) const { return 0 == strcmp(mStr, other.mStr); }
 
-        bool operator==(const char *other) const { return 0 == strcmp(mStr, other); }
+        inline bool operator==(const char *other) const { return 0 == strcmp(mStr, other); }
+
+        inline bool operator!=(const String &other) const { return !(*this == other); }
+
+        inline bool operator!=(const char *other) const { return !(*this == other); }
 
         String &rstrip(char c = ' ');
 

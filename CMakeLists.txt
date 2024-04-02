@@ -12,6 +12,9 @@ include_directories(
 
 
 set(MAIN_SOURCES
+        board/src/Board.cpp
+        board/src/BoardParser.cpp
+        board/src/HexVerifier.cpp
         utils/src/String.cpp
         utils/src/InputReaderImpl.cpp
 )
@@ -30,6 +33,7 @@ set(BOARD_TEST_SOURCES
         board/src/Cell.cpp
         board/src/Board.cpp
         board/src/BoardParser.cpp
+        board/src/HexVerifier.cpp
         board/tests/BoardTest.cpp
         board/tests/BoardParserTest.cpp
 )
