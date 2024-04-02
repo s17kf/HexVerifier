@@ -6,12 +6,14 @@
 
 #include <charconv>
 
+using data_structures::List;
+
 namespace utils {
 
     String::String(const String &other) : mSize(other.mSize), mCapacity(other.mCapacity) {
         mStr = new char[mCapacity + 1];
         mStr[mCapacity] = '\0';
-        strncpy(mStr, other.mStr, mSize + 1);
+        strncpy(mStr, other.mStr, mSize);
     }
 
     String::String(const char c) : mSize(1), mCapacity(1) {
@@ -34,6 +36,7 @@ namespace utils {
 
     String::String(size_t n) : mSize(0), mCapacity(n) {
         mStr = new char[n + 1];
+        mStr[n] = '\0';
     }
 
     String &String::operator=(const String &other) {
@@ -130,6 +133,31 @@ namespace utils {
 
     String& String::strip(char c) {
         return rstrip(c).lstrip(c);
+    }
+
+    List<String> String::split(char delimiter) const {
+        List<String> result;
+        size_t startPos = 0u;
+        for (size_t endPos = 0u; endPos < mSize; ++endPos) {
+            if (mStr[endPos] != delimiter)
+                continue;
+            if (endPos == startPos) {
+                ++startPos;
+                continue;
+            }
+            size_t newPartSize = endPos - startPos;
+            result.pushBack(String(newPartSize));
+            strncpy(result.back().mStr, &mStr[startPos], newPartSize);
+            result.back().mSize = newPartSize;
+            startPos = endPos + 1;
+        }
+        if (startPos < mSize){
+            size_t newPartSize = mSize - startPos;
+            result.pushBack(String(newPartSize));
+            strncpy(result.back().mStr, &mStr[startPos], newPartSize);
+            result.back().mSize = newPartSize;
+        }
+        return result;
     }
 
 } // utils

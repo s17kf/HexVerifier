@@ -8,6 +8,8 @@
 #include <cstdio>
 #include <cstring>
 
+#include "List.h"
+
 namespace utils {
 
     class String {
@@ -42,11 +44,17 @@ namespace utils {
             return mStr[index];
         }
 
-        String& rstrip(char c = ' ');
+        bool operator==(const String &other) const { return 0 == strcmp(mStr, other.mStr); }
 
-        String& lstrip(char c = ' ');
+        bool operator==(const char *other) const { return 0 == strcmp(mStr, other); }
 
-        String& strip(char c = ' ');
+        String &rstrip(char c = ' ');
+
+        String &lstrip(char c = ' ');
+
+        String &strip(char c = ' ');
+
+        data_structures::List<String> split(char delimiter = ' ') const;
 
     private:
         size_t mSize;

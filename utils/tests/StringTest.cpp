@@ -5,12 +5,21 @@
 #include "gtest/gtest.h"
 
 #include <cstring>
+#include <list>
 #include "String.h"
 
 using utils::String;
 
 class StringTest : public ::testing::Test {
 protected:
+    void verifySplitResult(const String &testedString, const std::list<std::string> &s1ExpectedParts) {
+        const auto splitResult = testedString.split();
+        std::list<std::string> splitResultAsListOfStrings;
+        for (auto &s: splitResult) {
+            splitResultAsListOfStrings.emplace_back(s.c_str());
+        }
+        ASSERT_EQ(s1ExpectedParts, splitResultAsListOfStrings);
+    }
 };
 
 TEST_F(StringTest, emptyString) {
@@ -152,4 +161,38 @@ TEST_F(StringTest, stripTest) {
     ASSERT_EQ(4, testedString.size());
     ASSERT_EQ(0, std::strcmp("text", testedString.c_str()))
                                 << "verified str: " << testedString.c_str();
+}
+
+TEST_F(StringTest, comparisonOperator) {
+    const String s1("xddd");
+    const String s2("xddd");
+    const String s3("xdDd");
+    ASSERT_EQ(s1, s2);
+    ASSERT_EQ(s1, s1);
+    ASSERT_NE(s1, s3);
+    ASSERT_NE(s2, s3);
+}
+
+TEST_F(StringTest, comparisonToCharArray) {
+    const String s1("testxD");
+    const char *c1 = "testxD";
+    const char *c2 = "testXD";
+    ASSERT_EQ(s1, c1);
+    ASSERT_NE(s1, c2);
+}
+
+TEST_F(StringTest, splitTest) {
+    const String s1("p1 pp2 part3 ppp4");
+    const std::list<std::string> s1ExpectedParts = {"p1", "pp2", "part3", "ppp4"};
+    verifySplitResult(s1, s1ExpectedParts);
+
+    const String s2("  p1 pp2     part3 ppp4    ");
+    verifySplitResult(s2, s1ExpectedParts);
+
+    const String s3("");
+    const std::list<std::string> emptyList;
+    verifySplitResult(s3, emptyList);
+
+    const String s4("   ");
+    verifySplitResult(s4, emptyList);
 }
