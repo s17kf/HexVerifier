@@ -8,6 +8,8 @@
 #include "Cell.h"
 #include "Vector.h"
 
+#include <functional>
+
 namespace board {
 
     class Board {
@@ -25,7 +27,7 @@ namespace board {
             return mSize;
         }
 
-        const Cell *getCell(size_t row, size_t cellNum) const {
+        Cell *getCell(size_t row, size_t cellNum) const {
             return mBoard[row]->at(cellNum);
         }
 
@@ -45,10 +47,46 @@ namespace board {
 
         bool isRedWin() const;
 
+        bool isRedWinOnce() const;
+
         bool isBlueWin() const;
 
+        bool isBlueWinOnce() const;
+
     private:
+        struct CellParent {
+            Cell *cell;
+            Cell *parent;
+        };
+        struct CellCoords {
+            size_t row;
+            size_t num;
+            Cell *parent;
+        };
+
         bool bfs(Cell *start, Cell *end, CellType acceptedType);
+
+        bool bfs(data_structures::List<CellCoords> &nexts,
+                 CellType color,
+                 Cell &endBorder,
+                 const std::function<bool(const Board &, size_t, size_t)> &done,
+                 const std::function<data_structures::List<CellCoords>(const Board &, size_t, size_t)> &getNeighbours);
+
+        static bool doneForBlue(const Board &board, size_t row, size_t num);
+
+        static bool doneForRed(const Board &board, size_t row, size_t num);
+
+        static data_structures::List<CellCoords> getNeighboursForBlue(const Board &board, size_t row, size_t num);
+
+        static data_structures::List<CellCoords> getNeighboursForRed(const Board &board, size_t row, size_t num);
+
+        void addNeighbourAbove(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
+
+        void addNeighbourBelow(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
+
+        void addNeighbourOnLeft(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
+
+        void addNeighbourOnRight(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
 
         void incColorCount(Cell::Type color);
 
@@ -57,6 +95,10 @@ namespace board {
         inline static void createConnection(Cell *c1, Cell *c2);
 
         void generateCellsAndConnections();
+
+        void clearVisited();
+
+        void visitParents(const Cell *lastChild, const Cell *greatParent);
 
         size_t mSize;
         size_t redCellsCount;

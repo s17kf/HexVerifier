@@ -5,6 +5,7 @@
 #include "Board.h"
 
 using data_structures::Vector;
+using data_structures::List;
 
 namespace board {
 
@@ -120,7 +121,7 @@ namespace board {
     bool Board::isBoardCorrect() const {
         auto redPawns = getColorCount(Cell::Type::red);
         auto bluePawns = getColorCount(Cell::Type::blue);
-        if (redPawns < bluePawns || redPawns > bluePawns + 1){
+        if (redPawns < bluePawns || redPawns > bluePawns + 1) {
             return false;
         }
         return true;
@@ -131,40 +132,229 @@ namespace board {
             return false;
         auto redPawns = getColorCount(Cell::Type::red);
         auto bluePawns = getColorCount(Cell::Type::blue);
-        if (bluePawns == redPawns && isRedWin())
+        if (bluePawns == redPawns && isRedWinOnce())
             return false;
-        if (bluePawns < redPawns && isBlueWin())
+        if (bluePawns < redPawns && isBlueWinOnce())
             return false;
         return true;
     }
 
     bool Board::isRedWin() const {
         Board copy(*this);
-        return copy.bfs(&copy.mRedBoarderRight, &copy.mRedBoarderLeft, CellType::red);
+        List<CellCoords> nexts;
+        for (size_t row = 0u; row < copy.mSize; ++row) {
+            if (mBoard[row]->at(0)->getType() == Cell::Type::red)
+                nexts.pushBack({row, 0, &copy.mRedBoarderRight});
+        }
+        return copy.bfs(nexts, Cell::Type::red, copy.mRedBoarderRight, Board::doneForRed, Board::getNeighboursForRed);
+    }
+
+    bool Board::isRedWinOnce() const {
+        Board copy(*this);
+        {
+            List<CellCoords> nexts;
+            for (size_t row = 0u; row < copy.mSize; ++row) {
+                if (mBoard[row]->at(0)->getType() == Cell::Type::red)
+                    nexts.pushBack({row, 0, &copy.mRedBoarderRight});
+            }
+            if (!copy.bfs(nexts, Cell::Type::red, copy.mRedBoarderRight, Board::doneForRed, Board::getNeighboursForRed))
+                return false;
+        }
+        copy.clearVisited();
+        copy.visitParents(&copy.mRedBoarderRight, &copy.mRedBoarderLeft);
+        {
+            List<CellCoords> nexts;
+            for (size_t row = 0u; row < copy.mSize; ++row) {
+                if (!mBoard[row]->at(0)->visited && mBoard[row]->at(0)->getType() == Cell::Type::red)
+                    nexts.pushBack({row, 0, &copy.mRedBoarderRight});
+            }
+            if (copy.bfs(nexts, Cell::Type::red, copy.mRedBoarderRight, Board::doneForRed, Board::getNeighboursForRed))
+                return false;
+        }
+        return true;
     }
 
     bool Board::isBlueWin() const {
         Board copy(*this);
-        return copy.bfs(&copy.mBlueBoarderLeft, &copy.mBlueBoarderRight, CellType::blue);
+        List<CellCoords> nexts;
+        for (size_t row = 0u; row < copy.mSize; ++row) {
+            if (mBoard[row]->last()->getType() == Cell::Type::blue)
+                nexts.pushBack({row, mBoard[row]->size() - 1, &copy.mBlueBoarderRight});
+        }
+        return copy.bfs(nexts, Cell::Type::blue, copy.mBlueBoarderLeft, Board::doneForBlue, Board::getNeighboursForBlue);
     }
 
+    bool Board::isBlueWinOnce() const {
+        Board copy(*this);
+        {
+            List<CellCoords> nexts;
+            for (size_t row = 0u; row < copy.mSize; ++row) {
+                if (mBoard[row]->last()->getType() == Cell::Type::blue)
+                    nexts.pushBack({row, mBoard[row]->size() - 1, &copy.mBlueBoarderRight});
+            }
+            if (!copy.bfs(nexts, Cell::Type::blue, copy.mBlueBoarderLeft, Board::doneForBlue, Board::getNeighboursForBlue))
+                return false;
+        }
+        copy.clearVisited();
+        copy.visitParents(&copy.mBlueBoarderLeft, &copy.mBlueBoarderRight);
+        {
+            List<CellCoords> nexts;
+            for (size_t row = 0u; row < copy.mSize; ++row) {
+                if (!mBoard[row]->last()->visited && mBoard[row]->last()->getType() == Cell::Type::blue)
+                    nexts.pushBack({row, mBoard[row]->size() - 1, &copy.mBlueBoarderRight});
+            }
+            if (copy.bfs(nexts, Cell::Type::blue, copy.mBlueBoarderLeft, Board::doneForBlue, Board::getNeighboursForBlue))
+                return false;
+        }
+        return true;
+    }
+
+    bool Board::doneForBlue(const Board &board, size_t row, size_t num) {
+        return row >= board.mSize - 1 && num == 0;
+    }
+
+    bool Board::doneForRed(const Board &board, size_t row, size_t num) {
+        return row >= board.mSize - 1 && num == board.mBoard[row]->size() - 1;
+    }
+
+    List <Board::CellCoords> Board::getNeighboursForBlue(const Board &board, size_t row, size_t num) {
+        List<CellCoords> neighbours;
+        board.addNeighbourAbove(row, num, neighbours);
+        board.addNeighbourOnLeft(row, num, neighbours);
+        board.addNeighbourBelow(row, num, neighbours);
+        board.addNeighbourOnRight(row, num, neighbours);
+        return neighbours;
+    }
+
+    List <Board::CellCoords> Board::getNeighboursForRed(const Board &board, size_t row, size_t num) {
+        List<CellCoords> neighbours;
+        board.addNeighbourAbove(row, num, neighbours);
+        board.addNeighbourOnRight(row, num, neighbours);
+        board.addNeighbourBelow(row, num, neighbours);
+        board.addNeighbourOnLeft(row, num, neighbours);
+        return neighbours;
+    }
+
+    void Board::addNeighbourAbove(size_t row, size_t num, List <CellCoords> &neighbours) const {
+        if (row > 1) {
+            if (row == mSize) {
+                neighbours.pushBack({row - 2, num});
+            } else {
+                if (row < mSize) {
+                    if (num > 0 && num < mBoard[row]->size() - 1)
+                        neighbours.pushBack({row - 2, num - 1});
+                } else {
+                    neighbours.pushBack({row - 2, num + 1});
+                }
+            }
+        }
+    }
+
+    void Board::addNeighbourBelow(size_t row, size_t num, List <CellCoords> &neighbours) const {
+        if (row < mBoard.size() - 2) {
+            if (row == mSize - 2) {
+                neighbours.pushBack({row + 2, num});
+            } else {
+                if (row < mSize - 1) {
+                    neighbours.pushBack({row + 2, num + 1});
+                } else {
+                    if (num > 0 && num < mBoard[row]->size() - 1)
+                        neighbours.pushBack({row + 2, num - 1});
+                }
+            }
+        }
+    }
+
+    void Board::addNeighbourOnLeft(size_t row, size_t num, List <CellCoords> &neighbours) const {
+        if (row == mSize - 1) {
+            if (num > 0) {
+                neighbours.pushBack({row - 1, num - 1});
+                neighbours.pushBack({row + 1, num - 1});
+            }
+        } else {
+            if (row < mSize) {
+                neighbours.pushBack({row + 1, num});
+                if (num > 0)
+                    neighbours.pushBack({row - 1, num - 1});
+            } else {
+                neighbours.pushBack({row - 1, num});
+                if (num > 0)
+                    neighbours.pushBack({row + 1, num - 1});
+            }
+        }
+    }
+
+    void Board::addNeighbourOnRight(size_t row, size_t num, List <CellCoords> &neighbours) const {
+        if (row == mSize - 1) {
+            if (num < mSize - 1) {
+                neighbours.pushBack({row - 1, num});
+                neighbours.pushBack({row + 1, num});
+            }
+        } else {
+            if (row < mSize) {
+                neighbours.pushBack({row + 1, num + 1});
+                if (row > 0 && num < mBoard[row]->size() - 1) {
+                    neighbours.pushBack({row - 1, num});
+                }
+            } else {
+                neighbours.pushBack({row - 1, num + 1});
+                if (row < mBoard.size() - 1 && num < mBoard[row]->size() - 1) {
+                    neighbours.pushBack({row + 1, num});
+                }
+            }
+        }
+    }
+
+
     bool Board::bfs(Cell *start, Cell *end, Board::CellType acceptedType) {
-        data_structures::List<Cell *> nexts;
+        data_structures::List<CellParent> nexts;
         for (auto *cell: start->getNeighbours()) {
-            if (cell->getType() == acceptedType) {
-                nexts.pushBack(cell);
+            cell->parent = start;
+            if (cell->getType() == acceptedType && !cell->visited) {
+                nexts.pushBack({cell, start});
             }
         }
         while (!nexts.empty()) {
-            auto *cell = nexts.popFront();
+            auto cellParent = nexts.popFront();
+            auto *cell = cellParent.cell;
             if (cell->visited)
                 continue;
             cell->visited = true;
+            cell->parent = cellParent.parent;
             for (auto *next: cell->getNeighbours()) {
-                if (next == end)
+                if (next == end) {
+                    end->parent = cell;
                     return true;
+                }
                 if (!next->visited && next->getType() == acceptedType) {
-                    nexts.pushBack(next);
+                    nexts.pushBack({next, cell});
+                }
+            }
+        }
+        return false;
+    }
+
+    bool Board::bfs(data_structures::List<CellCoords> &nexts,
+                    CellType color,
+                    Cell &endBorder,
+                    const std::function<bool(const Board &, size_t, size_t)> &done,
+                    const std::function<List<CellCoords>(const Board &, size_t, size_t)> &getNeighbours) {
+        while (!nexts.empty()) {
+            auto cellCoords = nexts.popFront();
+            auto *cell = getCell(cellCoords.row, cellCoords.num);
+            if (cell->visited || cell->getType() != color)
+                continue;
+            cell->visited = true;
+            cell->parent = cellCoords.parent;
+            if (done(*this, cellCoords.row, cellCoords.num)) {
+                endBorder.parent = cell;
+                return true;
+            }
+            for (auto &nextCoords: getNeighbours(*this, cellCoords.row, cellCoords.num)) {
+                auto next = getCell(nextCoords.row, nextCoords.num);
+                if (!next->visited && next->getType() == color) {
+                    nextCoords.parent = cell;
+                    nexts.pushBack(nextCoords);
                 }
             }
         }
@@ -237,6 +427,22 @@ namespace board {
             for (auto cellNum = 0u; cellNum < mSize - 1; ++cellNum) {
                 createConnection(mBoard[mSize - 2]->at(cellNum), mBoard[mSize]->at(cellNum));
             }
+        }
+    }
+
+    void Board::clearVisited() {
+        for (auto *row: mBoard) {
+            for (auto *cell: *row) {
+                cell->visited = false;
+            }
+        }
+    }
+
+    void Board::visitParents(const Cell *lastChild, const Cell *greatParent) {
+        Cell *cell = lastChild->parent;
+        while (cell != greatParent) {
+            cell->visited = true;
+            cell = cell->parent;
         }
     }
 

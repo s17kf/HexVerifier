@@ -40,6 +40,7 @@ namespace board {
         }
 
         bool visited = false;
+        Cell* parent = nullptr;
     private:
         Type mType;
         data_structures::List<Cell *> mNeighbours;
