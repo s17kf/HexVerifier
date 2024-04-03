@@ -39,6 +39,7 @@ namespace board {
             mNeighbours.pushBack(neighbour);
         }
 
+        bool visited = false;
     private:
         Type mType;
         data_structures::List<Cell *> mNeighbours;

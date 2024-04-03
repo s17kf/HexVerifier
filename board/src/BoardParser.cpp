@@ -14,6 +14,7 @@ namespace board {
     Board *BoardParser::generateBoard() {
         String *lastLine = mInputReader.getLine();
         if (*lastLine != BOARD_DELIMITER) {
+            delete lastLine;
             return nullptr;
         }
         delete lastLine;

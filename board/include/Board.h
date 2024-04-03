@@ -17,6 +17,8 @@ namespace board {
 
         explicit Board(size_t mSize);
 
+        Board(const Board &other);
+
         virtual ~Board();
 
         size_t getSize() const {
@@ -35,13 +37,26 @@ namespace board {
 
         void setType(size_t row, size_t cellNum, CellType type);
 
-        size_t getColorCount(Cell::Type color);
+        size_t getColorCount(Cell::Type color) const;
+
+        bool isBoardCorrect() const;
+
+        bool isBoardPossible() const;
+
+        bool isRedWin() const;
+
+        bool isBlueWin() const;
 
     private:
+        bool bfs(Cell *start, Cell *end, CellType acceptedType);
+
         void incColorCount(Cell::Type color);
 
         void decColorCount(Cell::Type color);
-        inline static void createConnection(Cell* c1, Cell* c2);
+
+        inline static void createConnection(Cell *c1, Cell *c2);
+
+        void generateCellsAndConnections();
 
         size_t mSize;
         size_t redCellsCount;
