@@ -43,15 +43,11 @@ namespace board {
 
         bool isBoardCorrect() const;
 
-        bool isBoardPossible() const;
+        bool isBoardPossible();
 
-        bool isRedWin() const;
+        bool isRedWin();
 
-        bool isRedWinOnce() const;
-
-        bool isBlueWin() const;
-
-        bool isBlueWinOnce() const;
+        bool isBlueWin();
 
     private:
         struct CellParent {
@@ -59,9 +55,16 @@ namespace board {
             Cell *parent;
         };
         struct CellCoords {
+            enum class Direction {
+                up,
+                down,
+                left,
+                right,
+            };
             size_t row;
             size_t num;
             Cell *parent;
+            Direction direction;
         };
 
         bool bfs(Cell *start, Cell *end, CellType acceptedType);
@@ -72,21 +75,37 @@ namespace board {
                  const std::function<bool(const Board &, size_t, size_t)> &done,
                  const std::function<data_structures::List<CellCoords>(const Board &, size_t, size_t)> &getNeighbours);
 
+        bool dfs(const data_structures::List<CellCoords> &nexts,
+                 CellType color,
+                 Cell &endBorder,
+                 const std::function<bool(const Board &, size_t, size_t)> &done,
+                 const std::function<data_structures::List<CellCoords>(const Board &,
+                                                                       const CellCoords &cellCoords)> &getNeighbours);
+
+        bool dfs(const CellCoords &cellCoords,
+                 CellType color,
+                 Cell &endBorder,
+                 const std::function<bool(const Board &, size_t, size_t)> &done,
+                 const std::function<data_structures::List<CellCoords>(const Board &,
+                                                                       const CellCoords &cellCoords)> &getNeighbours);
+
         static bool doneForBlue(const Board &board, size_t row, size_t num);
 
         static bool doneForRed(const Board &board, size_t row, size_t num);
 
-        static data_structures::List<CellCoords> getNeighboursForBlue(const Board &board, size_t row, size_t num);
+        static data_structures::List<CellCoords> getNeighboursForBlue(const Board &board, const CellCoords &cellCoords);
 
-        static data_structures::List<CellCoords> getNeighboursForRed(const Board &board, size_t row, size_t num);
+        static data_structures::List<CellCoords> getNeighboursForRed(const Board &board, const CellCoords &cellCoords);
 
         void addNeighbourAbove(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
 
         void addNeighbourBelow(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
 
-        void addNeighbourOnLeft(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
+        void
+        addNeighbourOnLeft(size_t row, size_t num, data_structures::List<CellCoords> &neighbours, bool topFirst) const;
 
-        void addNeighbourOnRight(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
+        void
+        addNeighbourOnRight(size_t row, size_t num, data_structures::List<CellCoords> &neighbours, bool topFirst) const;
 
         void incColorCount(Cell::Type color);
 
