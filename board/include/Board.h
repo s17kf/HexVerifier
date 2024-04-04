@@ -49,6 +49,10 @@ namespace board {
 
         bool isBlueWin();
 
+        bool canRedWinInNMoves(size_t n);
+
+        bool canBlueWinInNMoves(size_t n);
+
     private:
         struct CellParent {
             Cell *cell;
@@ -118,6 +122,17 @@ namespace board {
         void clearVisited();
 
         void visitParents(const Cell *lastChild, const Cell *greatParent);
+
+        bool canWin(size_t movesLeft, CellType color, data_structures::List<CellCoords> &emptyCellsCoords,
+                    const std::function<bool(Board &)> &isWin);
+
+        static bool isRedWinBfs(Board &board) {
+            return board.bfs(&board.mRedBoarderLeft, &board.mRedBoarderRight, CellType::red);
+        }
+
+        static bool isBlueWinBfs(Board &board) {
+            return board.bfs(&board.mBlueBoarderRight, &board.mBlueBoarderLeft, Cell::Type::blue);
+        }
 
         size_t mSize;
         size_t redCellsCount;

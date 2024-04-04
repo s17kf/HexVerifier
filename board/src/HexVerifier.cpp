@@ -4,6 +4,8 @@
 
 #include "HexVerifier.h"
 
+#include <charconv>
+
 #include "Board.h"
 #include "BoardParser.h"
 #include "String.h"
@@ -47,13 +49,45 @@ namespace board {
             return;
         }
         if (*query == "IS_BOARD_POSSIBLE") {
-            if (board->isBoardPossible()){
+            if (board->isBoardPossible()) {
                 printf("YES\n");
             } else {
                 printf("NO\n");
             }
             return;
         }
+        auto splittedQuery = query->split('_');
+        auto wordIt = splittedQuery.begin();
+        if(*(wordIt++) != "CAN") {
+            printf("%s: query is NOT SUPPORTED!\n", query->c_str());
+            return;
+        }
+        String &color = *wordIt++;
+        ++wordIt; // skip 'WIN'
+        ++wordIt; // skip 'IN'
+        String &movesStr = *wordIt++;
+        int moves;
+        std::from_chars(movesStr.c_str(), movesStr.c_str() + movesStr.size(), moves);
+        ++wordIt; // skip 'MOVE(S)'
+        ++wordIt; // skip 'WITH'
+        String &opponentType = *wordIt;
+        if(opponentType == "NAIVE") {
+            if(color == "RED"){
+                if (board->canRedWinInNMoves(moves))
+                    printf("YES\n");
+                else
+                    printf("NO\n");
+                return;
+            }
+            if(color == "BLUE"){
+                if (board->canBlueWinInNMoves(moves))
+                    printf("YES\n");
+                else
+                    printf("NO\n");
+                return;
+            }
+        }
+
         printf("%s: query is not handled yet\n", query->c_str());
     }
 
@@ -64,12 +98,18 @@ namespace board {
             return;
 
         String *lastLine = inputReader.getLine();
-        while (lastLine->size() > 0) {
+        while (!inputReader.eof() && *lastLine != boardParser.BOARD_DELIMITER) {
+            if (lastLine->size() == 0) {
+                delete lastLine;
+                lastLine = inputReader.getLine();
+                continue;
+            }
             handleQuery(lastLine, board);
             printf("\n");
             delete lastLine;
             lastLine = inputReader.getLine();
         }
+        printf("\n");
         delete lastLine;
         delete board;
     }

@@ -13,25 +13,24 @@ namespace board {
 
     Board *BoardParser::generateBoard() {
         String *lastLine = mInputReader.getLine();
-        if (*lastLine != BOARD_DELIMITER) {
+        if (*lastLine == BOARD_DELIMITER) {
             delete lastLine;
-            return nullptr;
+            lastLine = mInputReader.getLine();
         }
-        delete lastLine;
-        lastLine = mInputReader.getLine();
         List<String *> lines;
-        size_t linesCounter = 0;
         while (*lastLine != BOARD_DELIMITER) {
-            ++linesCounter;
             lines.pushBack(lastLine);
             lastLine = mInputReader.getLine();
         }
         delete lastLine;
+        if (lines.size() == 0){
+            return nullptr;
+        }
 
-        auto size = (linesCounter + 1) / 2;
+        auto size = (lines.size() + 1) / 2;
         auto *board = new Board(size);
         auto lineIt = lines.begin();
-        for (size_t row = 0u; row < linesCounter; ++row, ++lineIt) {
+        for (size_t row = 0u; row < lines.size(); ++row, ++lineIt) {
             auto lineSplitted = (*lineIt)->split();
             size_t cellNum = 0u;
             for (auto &token: lineSplitted) {

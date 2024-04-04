@@ -16,8 +16,8 @@ namespace board {
 
         Board *generateBoard();
 
-    private:
         const char* BOARD_DELIMITER = "---";
+    private:
         utils::InputReader &mInputReader;
     };
 

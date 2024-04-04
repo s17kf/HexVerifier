@@ -68,4 +68,5 @@ TEST_F(BoardParserTest, boardCreationSetsProperCellTypes) {
 
     ASSERT_EQ(4, board->getColorCount(Cell::Type::blue));
     ASSERT_EQ(5, board->getColorCount(Cell::Type::red));
+    ASSERT_EQ(7, board->getColorCount(Cell::Type::empty));
 }
