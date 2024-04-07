@@ -134,6 +134,12 @@ namespace board {
             return board.bfs(&board.mBlueBoarderRight, &board.mBlueBoarderLeft, Cell::Type::blue);
         }
 
+        inline bool isGameWonBySomeone();
+
+        inline bool enoughEmptyCells(CellType playerToCheck, size_t neededMoves) const;
+
+        inline void fillEmtyCellsCoordsList(List <CellCoords> &emptyCellsCoords) const;
+
         size_t mSize;
         size_t redCellsCount;
         size_t blueCellsCount;

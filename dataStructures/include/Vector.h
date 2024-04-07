@@ -5,6 +5,8 @@
 #ifndef HEX_VECTOR_H
 #define HEX_VECTOR_H
 
+#include <iterator>
+
 namespace data_structures {
 
     template<typename T>

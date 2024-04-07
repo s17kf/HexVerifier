@@ -173,69 +173,49 @@ namespace board {
     }
 
     bool Board::canRedWinInNMoves(size_t n) {
-        if (!isBoardCorrect()) {
+        if (!isBoardCorrect() || !enoughEmptyCells(Cell::Type::red, n) || isGameWonBySomeone()) {
             return false;
         }
-        if (isRedWinBfs(*this)) {
-            clearVisited();
-            return false;
-        }
-        clearVisited();
-        if (isBlueWinBfs(*this)) {
-            clearVisited();
-            return false;
-        }
-        clearVisited();
-        size_t neededEmptyCells = redCellsCount > blueCellsCount ? 2 * n : 2 * n - 1;
-        if (getColorCount(Cell::Type::empty) < neededEmptyCells)
-            return false;
         List<CellCoords> emptyCellsCoords;
-        for (size_t row = 0u; row < mBoard.size(); ++row) {
-            for (size_t num = 0u; num < mBoard[row]->size(); ++num) {
-                if (mBoard[row]->at(num)->getType() == Cell::Type::empty)
-                    emptyCellsCoords.pushBack({row, num});
-            }
-        }
+        fillEmtyCellsCoordsList(emptyCellsCoords);
         return canWin(n, Cell::Type::red, emptyCellsCoords, Board::isRedWinBfs);
     }
 
     bool Board::canBlueWinInNMoves(size_t n) {
-        if (!isBoardCorrect()) {
+        if (!isBoardCorrect() || !enoughEmptyCells(Cell::Type::blue, n) || isGameWonBySomeone()) {
             return false;
         }
-        if (isRedWinBfs(*this)) {
-            clearVisited();
-            return false;
-        }
-        clearVisited();
-        if (isBlueWinBfs(*this)) {
-            clearVisited();
-            return false;
-        }
-        clearVisited();
-        size_t neededEmptyCells = redCellsCount > blueCellsCount ? 2 * n - 1 : 2 * n;
-        if (getColorCount(Cell::Type::empty) < neededEmptyCells)
-            return false;
         List<CellCoords> emptyCellsCoords;
+        fillEmtyCellsCoordsList(emptyCellsCoords);
+        return canWin(n, Cell::Type::blue, emptyCellsCoords, Board::isBlueWinBfs);
+    }
+
+    void Board::fillEmtyCellsCoordsList(List <CellCoords> &emptyCellsCoords) const {
         for (size_t row = 0u; row < mBoard.size(); ++row) {
             for (size_t num = 0u; num < mBoard[row]->size(); ++num) {
                 if (mBoard[row]->at(num)->getType() == Cell::Type::empty)
                     emptyCellsCoords.pushBack({row, num});
             }
         }
-        return canWin(n, Cell::Type::blue, emptyCellsCoords, Board::isBlueWinBfs);
     }
 
+    bool Board::enoughEmptyCells(CellType playerToCheck, size_t neededMoves) const {
+        size_t neededEmptyCells;
+        switch (playerToCheck) {
+            case Cell::Type::red:
+                neededEmptyCells = redCellsCount > blueCellsCount ? 2 * neededMoves : 2 * neededMoves - 1;
+                break;
+            case Cell::Type::blue:
+                neededEmptyCells = redCellsCount > blueCellsCount ? 2 * neededMoves - 1 : 2 * neededMoves;
+                break;
+            default:
+                throw std::invalid_argument("Can check empty cells count for red or blue only");
+        }
+        return getColorCount(Cell::Type::empty) >= neededEmptyCells;
+    }
 
     bool Board::canWin(size_t movesLeft, CellType color, List <CellCoords> &emptyCellsCoords,
                        const std::function<bool(Board &)> &isWin) {
-        std::vector<CellCoords> visited;
-        for (size_t row = 0u; row < mBoard.size(); ++row) {
-            for (size_t num = 0u; num < mBoard[row]->size(); ++num) {
-                if (mBoard[row]->at(num)->visited)
-                    visited.push_back({row, num});
-            }
-        }
         if (movesLeft == 1) {
             for (auto &cellCoords: emptyCellsCoords) {
                 auto *cell = getCell(cellCoords.row, cellCoords.num);
@@ -268,6 +248,20 @@ namespace board {
             }
             cell->setType(Cell::Type::empty);
         }
+        return false;
+    }
+
+    bool Board::isGameWonBySomeone() {
+        if (isRedWinBfs(*this)) {
+            clearVisited();
+            return true;
+        }
+        clearVisited();
+        if (isBlueWinBfs(*this)) {
+            clearVisited();
+            return true;
+        }
+        clearVisited();
         return false;
     }
 
