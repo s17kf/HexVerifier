@@ -5,6 +5,7 @@
 #ifndef HEX_CELL_H
 #define HEX_CELL_H
 
+#include <cstdint>
 #include "List.h"
 
 namespace board {
@@ -41,6 +42,8 @@ namespace board {
 
         bool visited = false;
         Cell* parent = nullptr;
+        size_t closestBlue = SIZE_MAX;
+        size_t closestRed = SIZE_MAX;
     private:
         Type mType;
         data_structures::List<Cell *> mNeighbours;

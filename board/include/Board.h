@@ -27,11 +27,11 @@ namespace board {
             return mSize;
         }
 
-        Cell *getCell(size_t row, size_t cellNum) const {
+        inline Cell *getCell(size_t row, size_t cellNum) const {
             return mBoard[row]->at(cellNum);
         }
 
-        const Cell *getLastCellInRow(size_t row) const {
+        inline Cell *getLastCellInRow(size_t row) const {
             return mBoard[row]->last();
         }
 
@@ -53,6 +53,8 @@ namespace board {
 
         bool canBlueWinInNMoves(size_t n);
 
+        bool canRedWinInNMovesWithPerfectOpponent(size_t n);
+
     private:
         struct CellParent {
             Cell *cell;
@@ -70,6 +72,10 @@ namespace board {
             Cell *parent;
             Direction direction;
         };
+
+        Cell *getCell(CellCoords coords) const {
+            return getCell(coords.row, coords.num);
+        }
 
         bool bfs(Cell *start, Cell *end, CellType acceptedType);
 
@@ -101,15 +107,17 @@ namespace board {
 
         static data_structures::List<CellCoords> getNeighboursForRed(const Board &board, const CellCoords &cellCoords);
 
-        void addNeighbourAbove(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
+        void addNeighbourAbove(size_t row, size_t num, Cell *cell, CellType color,
+                               data_structures::List<CellCoords> &neighbours) const;
 
-        void addNeighbourBelow(size_t row, size_t num, data_structures::List<CellCoords> &neighbours) const;
+        void addNeighbourBelow(size_t row, size_t num, Cell *cell, CellType color,
+                               data_structures::List<CellCoords> &neighbours) const;
 
-        void
-        addNeighbourOnLeft(size_t row, size_t num, data_structures::List<CellCoords> &neighbours, bool topFirst) const;
+        void addNeighbourOnLeft(size_t row, size_t num, Cell *cell, CellType color,
+                                data_structures::List<CellCoords> &neighbours, bool topFirst) const;
 
-        void
-        addNeighbourOnRight(size_t row, size_t num, data_structures::List<CellCoords> &neighbours, bool topFirst) const;
+        void addNeighbourOnRight(size_t row, size_t num, Cell *cell, CellType color,
+                                 data_structures::List<CellCoords> &neighbours, bool topFirst) const;
 
         void incColorCount(Cell::Type color);
 
@@ -118,6 +126,13 @@ namespace board {
         inline static void createConnection(Cell *c1, Cell *c2);
 
         void generateCellsAndConnections();
+
+        inline bool visited(size_t row, size_t num) const {
+            return getCell(row, num)->visited;
+        }
+
+        inline void addToListIfNotVisited(size_t row, size_t num, data_structures::List<CellCoords> &list, Cell *parent,
+                                          CellCoords::Direction direction, CellType color) const;
 
         void clearVisited();
 
@@ -138,7 +153,7 @@ namespace board {
 
         inline bool enoughEmptyCells(CellType playerToCheck, size_t neededMoves) const;
 
-        inline void fillEmtyCellsCoordsList(List <CellCoords> &emptyCellsCoords) const;
+        inline void fillEmptyCellsCoordsList(data_structures::List<CellCoords> &emptyCellsCoords) const;
 
         size_t mSize;
         size_t redCellsCount;
