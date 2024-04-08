@@ -7,10 +7,20 @@
 
 #include "Cell.h"
 #include "Vector.h"
+#include "CellCoords.h"
+#include "NeighboursGenerators.h"
 
 #include <functional>
 
 namespace board {
+
+    class DoneVerifier;
+
+    class WinVerifier;
+
+    class RedWinVerifier;
+
+    class BlueWinVerifier;
 
     class Board {
     public:
@@ -23,12 +33,24 @@ namespace board {
 
         virtual ~Board();
 
-        size_t getSize() const {
+        inline size_t getSize() const {
             return mSize;
+        }
+
+        inline size_t rows() const {
+            return mBoard.size();
+        }
+
+        inline size_t cells(size_t row) const {
+            return mBoard[row]->size();
         }
 
         inline Cell *getCell(size_t row, size_t cellNum) const {
             return mBoard[row]->at(cellNum);
+        }
+
+        inline Cell *getCell(CellCoords coords) const {
+            return getCell(coords.row, coords.num);
         }
 
         inline Cell *getLastCellInRow(size_t row) const {
@@ -60,22 +82,35 @@ namespace board {
             Cell *cell;
             Cell *parent;
         };
-        struct CellCoords {
-            enum class Direction {
-                up,
-                down,
-                left,
-                right,
-            };
-            size_t row;
-            size_t num;
-            Cell *parent;
-            Direction direction;
+
+        class CellDistanceEvaluator {
+        public:
+            virtual bool operator()(const Cell *cell) const = 0;
         };
 
-        Cell *getCell(CellCoords coords) const {
-            return getCell(coords.row, coords.num);
-        }
+        class CellRedDistanceEvaluator : public CellDistanceEvaluator {
+        public:
+            explicit CellRedDistanceEvaluator(size_t allowedDistance) : allowedDistance(allowedDistance) {}
+
+            bool operator()(const Cell *cell) const override {
+                return cell->closestRed <= allowedDistance;
+            }
+
+        private:
+            size_t allowedDistance;
+        };
+
+        class CellBlueDistanceEvaluator : public CellDistanceEvaluator {
+        public:
+            explicit CellBlueDistanceEvaluator(size_t allowedDistance) : allowedDistance(allowedDistance) {}
+
+            bool operator()(const Cell *cell) const override {
+                return cell->closestBlue <= allowedDistance;
+            }
+
+        private:
+            size_t allowedDistance;
+        };
 
         bool bfs(Cell *start, Cell *end, CellType acceptedType);
 
@@ -88,36 +123,14 @@ namespace board {
         bool dfs(const data_structures::List<CellCoords> &nexts,
                  CellType color,
                  Cell &endBorder,
-                 const std::function<bool(const Board &, size_t, size_t)> &done,
-                 const std::function<data_structures::List<CellCoords>(const Board &,
-                                                                       const CellCoords &cellCoords)> &getNeighbours);
+                 const DoneVerifier &doneVerifier,
+                 const NeighboursGenerator &neighboursGenerator);
 
         bool dfs(const CellCoords &cellCoords,
                  CellType color,
                  Cell &endBorder,
-                 const std::function<bool(const Board &, size_t, size_t)> &done,
-                 const std::function<data_structures::List<CellCoords>(const Board &,
-                                                                       const CellCoords &cellCoords)> &getNeighbours);
-
-        static bool doneForBlue(const Board &board, size_t row, size_t num);
-
-        static bool doneForRed(const Board &board, size_t row, size_t num);
-
-        static data_structures::List<CellCoords> getNeighboursForBlue(const Board &board, const CellCoords &cellCoords);
-
-        static data_structures::List<CellCoords> getNeighboursForRed(const Board &board, const CellCoords &cellCoords);
-
-        void addNeighbourAbove(size_t row, size_t num, Cell *cell, CellType color,
-                               data_structures::List<CellCoords> &neighbours) const;
-
-        void addNeighbourBelow(size_t row, size_t num, Cell *cell, CellType color,
-                               data_structures::List<CellCoords> &neighbours) const;
-
-        void addNeighbourOnLeft(size_t row, size_t num, Cell *cell, CellType color,
-                                data_structures::List<CellCoords> &neighbours, bool topFirst) const;
-
-        void addNeighbourOnRight(size_t row, size_t num, Cell *cell, CellType color,
-                                 data_structures::List<CellCoords> &neighbours, bool topFirst) const;
+                 const DoneVerifier &doneVerifier,
+                 const NeighboursGenerator &neighboursGenerator);
 
         void incColorCount(Cell::Type color);
 
@@ -131,29 +144,19 @@ namespace board {
             return getCell(row, num)->visited;
         }
 
-        inline void addToListIfNotVisited(size_t row, size_t num, data_structures::List<CellCoords> &list, Cell *parent,
-                                          CellCoords::Direction direction, CellType color) const;
-
         void clearVisited();
 
         void visitParents(const Cell *lastChild, const Cell *greatParent);
 
         bool canWin(size_t movesLeft, CellType color, data_structures::List<CellCoords> &emptyCellsCoords,
-                    const std::function<bool(Board &)> &isWin);
-
-        static bool isRedWinBfs(Board &board) {
-            return board.bfs(&board.mRedBoarderLeft, &board.mRedBoarderRight, CellType::red);
-        }
-
-        static bool isBlueWinBfs(Board &board) {
-            return board.bfs(&board.mBlueBoarderRight, &board.mBlueBoarderLeft, Cell::Type::blue);
-        }
+                    const WinVerifier &winVerifier);
 
         inline bool isGameWonBySomeone();
 
         inline bool enoughEmptyCells(CellType playerToCheck, size_t neededMoves) const;
 
-        inline void fillEmptyCellsCoordsList(data_structures::List<CellCoords> &emptyCellsCoords) const;
+        inline void fillEmptyCellsCoordsList(data_structures::List<CellCoords> &emptyCellsCoords,
+                                             const CellDistanceEvaluator *evaluator = nullptr) const;
 
         size_t mSize;
         size_t redCellsCount;
@@ -163,6 +166,12 @@ namespace board {
         Cell mBlueBoarderLeft;
         Cell mBlueBoarderRight;
         data_structures::Vector<data_structures::Vector<Cell *> *> mBoard;
+
+        friend class NeighboursGenerator;
+
+        friend class RedWinVerifier;
+
+        friend class BlueWinVerifier;
     };
 
 } // board

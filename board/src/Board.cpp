@@ -3,6 +3,8 @@
 //
 
 #include "Board.h"
+#include "DoneVerifiers.h"
+#include "WinVerifiers.h"
 
 
 using data_structures::Vector;
@@ -168,7 +170,9 @@ namespace board {
             if (mBoard[row]->at(0)->getType() == Cell::Type::red)
                 nexts.pushBack({row, 0, &mRedBoarderLeft, CellCoords::Direction::right});
         }
-        return dfs(nexts, Cell::Type::red, mRedBoarderRight, Board::doneForRed, Board::getNeighboursForRed);
+        RedDoneVerifier doneVerifier(*this);
+        RedNeighboursGenerator neighboursGenerator(*this);
+        return dfs(nexts, Cell::Type::red, mRedBoarderRight, doneVerifier, neighboursGenerator);
     }
 
     bool Board::isBlueWin() {
@@ -177,7 +181,9 @@ namespace board {
             if (mBoard[row]->last()->getType() == Cell::Type::blue)
                 nexts.pushBack({row, mBoard[row]->size() - 1, &mBlueBoarderRight, CellCoords::Direction::left});
         }
-        return dfs(nexts, Cell::Type::blue, mBlueBoarderLeft, Board::doneForBlue, Board::getNeighboursForBlue);
+        BlueDoneVerifier doneVerifier(*this);
+        BlueNeighboursGenerator neighboursGenerator(*this);
+        return dfs(nexts, Cell::Type::blue, mBlueBoarderLeft, doneVerifier, neighboursGenerator);
     }
 
     bool Board::canRedWinInNMoves(size_t n) {
@@ -186,7 +192,8 @@ namespace board {
         }
         List<CellCoords> emptyCellsCoords;
         fillEmptyCellsCoordsList(emptyCellsCoords);
-        return canWin(n, Cell::Type::red, emptyCellsCoords, Board::isRedWinBfs);
+        RedWinVerifier winVerifier(*this);
+        return canWin(n, Cell::Type::red, emptyCellsCoords, winVerifier);
     }
 
     bool Board::canBlueWinInNMoves(size_t n) {
@@ -195,7 +202,8 @@ namespace board {
         }
         List<CellCoords> emptyCellsCoords;
         fillEmptyCellsCoordsList(emptyCellsCoords);
-        return canWin(n, Cell::Type::blue, emptyCellsCoords, Board::isBlueWinBfs);
+        BlueWinVerifier winVerifier(*this);
+        return canWin(n, Cell::Type::blue, emptyCellsCoords, winVerifier);
     }
 
     bool Board::canRedWinInNMovesWithPerfectOpponent(size_t n) {
@@ -203,6 +211,7 @@ namespace board {
         if (!isBoardCorrect() || !enoughEmptyCells(color, n) || isGameWonBySomeone()) {
             return false;
         }
+        // calculate distances for empty cells
         List<CellCoords> nexts;
         for (size_t row = 0u; row < mSize; ++row) {
             nexts.pushBack({row, 0, &mRedBoarderLeft});
@@ -210,24 +219,28 @@ namespace board {
         for (size_t row = mSize - 1; row < mBoard.size(); ++row) {
             nexts.pushBack({row, mBoard[row]->size() - 1, &mRedBoarderLeft});
         }
+        RedNeighboursGenerator neighboursGenerator(*this);
         while (!nexts.empty()) {
             auto coords = nexts.popFront();
             auto cell = getCell(coords);
             cell->visited = true;
-
-            break;
+            if (cell->getType() != color && cell->getType() != Cell::Type::empty)
+                continue;
+            if (cell->getType() == color) {
+                cell->closestRed = 0;
+            } else if (cell->getType() == Cell::Type::empty) {
+                cell->closestRed = cell->parent->closestRed + 1;
+            }
+            neighboursGenerator.fill(nexts, coords, true);
         }
         clearVisited();
-        return false;
-    }
 
-    void Board::fillEmptyCellsCoordsList(data_structures::List<CellCoords> &emptyCellsCoords) const {
-        for (size_t row = 0u; row < mBoard.size(); ++row) {
-            for (size_t num = 0u; num < mBoard[row]->size(); ++num) {
-                if (mBoard[row]->at(num)->getType() == Cell::Type::empty)
-                    emptyCellsCoords.pushBack({row, num});
-            }
-        }
+        List<CellCoords> emptyCellsToPlay;
+        CellRedDistanceEvaluator cellRedDistanceEvaluator(n);
+        fillEmptyCellsCoordsList(emptyCellsToPlay, &cellRedDistanceEvaluator);
+
+
+        return false;
     }
 
     bool Board::enoughEmptyCells(CellType playerToCheck, size_t neededMoves) const {
@@ -246,12 +259,12 @@ namespace board {
     }
 
     bool Board::canWin(size_t movesLeft, CellType color, List <CellCoords> &emptyCellsCoords,
-                       const std::function<bool(Board &)> &isWin) {
+                       const WinVerifier &winVerifier) {
         if (movesLeft == 1) {
             for (auto &cellCoords: emptyCellsCoords) {
                 auto *cell = getCell(cellCoords.row, cellCoords.num);
                 cell->setType(color);
-                if (isWin(*this)) {
+                if (winVerifier()) {
                     cell->setType(Cell::Type::empty);
                     clearVisited();
                     return true;
@@ -266,14 +279,14 @@ namespace board {
             auto cellCoords = emptyCellsCoords.popFront();
             auto *cell = getCell(cellCoords.row, cellCoords.num);
             cell->setType(color);
-            if (isWin(*this)) {
+            if (winVerifier()) {
                 clearVisited();
                 cell->setType(Cell::Type::empty);
                 emptyCellsCoords.pushBack(cellCoords);
                 continue;
             }
             clearVisited();
-            if (canWin(movesLeft - 1, color, emptyCellsCoords, isWin)) {
+            if (canWin(movesLeft - 1, color, emptyCellsCoords, winVerifier)) {
                 cell->setType(Cell::Type::empty);
                 return true;
             }
@@ -283,12 +296,12 @@ namespace board {
     }
 
     bool Board::isGameWonBySomeone() {
-        if (isRedWinBfs(*this)) {
+        if (RedWinVerifier(*this)()) {
             clearVisited();
             return true;
         }
         clearVisited();
-        if (isBlueWinBfs(*this)) {
+        if (BlueWinVerifier(*this)()) {
             clearVisited();
             return true;
         }
@@ -324,13 +337,12 @@ namespace board {
     }
 
     bool Board::dfs(const List <CellCoords> &nexts, Board::CellType color, Cell &endBorder,
-                    const std::function<bool(const Board &, size_t, size_t)> &done,
-                    const std::function<List<CellCoords>(const Board &, const CellCoords &cellCoords)> &getNeighbours) {
+                    const DoneVerifier &doneVerifier, const NeighboursGenerator &neighboursGenerator) {
         for (const auto nextCoords: nexts) {
             auto *cell = getCell(nextCoords.row, nextCoords.num);
             if (cell->visited || cell->getType() != color)
                 continue;
-            if (dfs(nextCoords, color, endBorder, done, getNeighbours)) {
+            if (dfs(nextCoords, color, endBorder, doneVerifier, neighboursGenerator)) {
                 clearVisited();
                 return true;
             }
@@ -339,147 +351,20 @@ namespace board {
         return false;
     }
 
-    bool Board::dfs(const Board::CellCoords &cellCoords, Board::CellType color, Cell &endBorder,
-                    const std::function<bool(const Board &, size_t, size_t)> &done,
-                    const std::function<List<CellCoords>(const Board &, const CellCoords &cellCoords)> &getNeighbours) {
+    bool Board::dfs(const CellCoords &cellCoords, Board::CellType color, Cell &endBorder,
+                    const DoneVerifier &doneVerifier, const NeighboursGenerator &neighboursGenerator) {
         auto *cell = getCell(cellCoords.row, cellCoords.num);
         cell->parent = cellCoords.parent;
         cell->visited = true;
-        if (done(*this, cellCoords.row, cellCoords.num)) {
+        if (doneVerifier(cellCoords)) {
             endBorder.parent = cell;
             return true;
         }
-        for (auto &nextCoords: getNeighbours(*this, cellCoords)) {
-            if (dfs(nextCoords, color, endBorder, done, getNeighbours))
+        for (auto &nextCoords: neighboursGenerator.get(cellCoords, false)) {
+            if (dfs(nextCoords, color, endBorder, doneVerifier, neighboursGenerator))
                 return true;
         }
         return false;
-    }
-
-    bool Board::doneForBlue(const Board &board, size_t row, size_t num) {
-        return row >= board.mSize - 1 && num == 0;
-    }
-
-    bool Board::doneForRed(const Board &board, size_t row, size_t num) {
-        return row >= board.mSize - 1 && num == board.mBoard[row]->size() - 1;
-    }
-
-    List <Board::CellCoords> Board::getNeighboursForBlue(const Board &board, const CellCoords &cellCoords) {
-        auto row = cellCoords.row;
-        auto num = cellCoords.num;
-        auto *cell = board.getCell(cellCoords);
-        List<CellCoords> neighbours;
-        if (cellCoords.direction != CellCoords::Direction::right)
-            board.addNeighbourAbove(row, num, cell, CellType::blue, neighbours);
-        board.addNeighbourOnLeft(row, num, cell, CellType::blue, neighbours, true);
-        board.addNeighbourBelow(row, num, cell, CellType::blue, neighbours);
-        board.addNeighbourOnRight(row, num, cell, CellType::blue, neighbours, false);
-        if (cellCoords.direction == CellCoords::Direction::right)
-            board.addNeighbourAbove(row, num, cell, CellType::blue, neighbours);
-        return neighbours;
-    }
-
-    List <Board::CellCoords> Board::getNeighboursForRed(const Board &board, const CellCoords &cellCoords) {
-        auto row = cellCoords.row;
-        auto num = cellCoords.num;
-        auto *cell = board.getCell(cellCoords);
-        List<CellCoords> neighbours;
-        if (cellCoords.direction != CellCoords::Direction::left)
-            board.addNeighbourAbove(row, num, cell, CellType::red, neighbours);
-        board.addNeighbourOnRight(row, num, cell, CellType::red, neighbours, true);
-        board.addNeighbourBelow(row, num, cell, CellType::red, neighbours);
-        board.addNeighbourOnLeft(row, num, cell, CellType::red, neighbours, false);
-        if (cellCoords.direction == CellCoords::Direction::left)
-            board.addNeighbourAbove(row, num, cell, CellType::red, neighbours);
-        return neighbours;
-    }
-
-    void Board::addNeighbourAbove(
-            size_t row, size_t num, Cell *cell, CellType color, List <CellCoords> &neighbours) const {
-        if (row > 1) {
-            if (row == mSize) {
-                addToListIfNotVisited(row - 2, num, neighbours, cell, CellCoords::Direction::up, color);
-            } else {
-                if (row < mSize) {
-                    if (num > 0 && num < mBoard[row]->size() - 1)
-                        addToListIfNotVisited(row - 2, num - 1, neighbours, cell, CellCoords::Direction::up, color);;
-                } else {
-                    addToListIfNotVisited(row - 2, num + 1, neighbours, cell, CellCoords::Direction::up, color);;
-                }
-            }
-        }
-    }
-
-    void Board::addNeighbourBelow(
-            size_t row, size_t num, Cell *cell, CellType color, List <CellCoords> &neighbours) const {
-        if (row < mBoard.size() - 2) {
-            if (row == mSize - 2) {
-                addToListIfNotVisited(row + 2, num, neighbours, cell, CellCoords::Direction::down, color);;
-            } else {
-                if (row < mSize - 1) {
-                    addToListIfNotVisited(row + 2, num + 1, neighbours, cell, CellCoords::Direction::down, color);;
-                } else {
-                    if (num > 0 && num < mBoard[row]->size() - 1)
-                        addToListIfNotVisited(row + 2, num - 1, neighbours, cell, CellCoords::Direction::down, color);;
-                }
-            }
-        }
-    }
-
-    void Board::addNeighbourOnLeft(size_t row, size_t num, Cell *cell, CellType color, List <CellCoords> &neighbours,
-                                   bool topFirst) const {
-        if (row == mSize - 1) {
-            if (num > 0) {
-                if (!topFirst)
-                    addToListIfNotVisited(row + 1, num - 1, neighbours, cell, CellCoords::Direction::left, color);;
-                addToListIfNotVisited(row - 1, num - 1, neighbours, cell, CellCoords::Direction::left, color);;
-                if (topFirst)
-                    addToListIfNotVisited(row + 1, num - 1, neighbours, cell, CellCoords::Direction::left, color);;
-            }
-        } else {
-            if (row < mSize) {
-                if (!topFirst)
-                    addToListIfNotVisited(row + 1, num, neighbours, cell, CellCoords::Direction::left, color);;
-                if (num > 0)
-                    addToListIfNotVisited(row - 1, num - 1, neighbours, cell, CellCoords::Direction::left, color);;
-                if (topFirst)
-                    addToListIfNotVisited(row + 1, num, neighbours, cell, CellCoords::Direction::left, color);;
-            } else {
-                if (!topFirst && num > 0)
-                    addToListIfNotVisited(row + 1, num - 1, neighbours, cell, CellCoords::Direction::left, color);;
-                addToListIfNotVisited(row - 1, num, neighbours, cell, CellCoords::Direction::left, color);;
-                if (topFirst && num > 0)
-                    addToListIfNotVisited(row + 1, num - 1, neighbours, cell, CellCoords::Direction::left, color);;
-            }
-        }
-    }
-
-    void Board::addNeighbourOnRight(size_t row, size_t num, Cell *cell, CellType color, List <CellCoords> &neighbours,
-                                    bool topFirst) const {
-        if (row == mSize - 1) {
-            if (num < mSize - 1) {
-                if (!topFirst)
-                    addToListIfNotVisited(row + 1, num, neighbours, cell, CellCoords::Direction::right, color);;
-                addToListIfNotVisited(row - 1, num, neighbours, cell, CellCoords::Direction::right, color);;
-                if (topFirst)
-                    addToListIfNotVisited(row + 1, num, neighbours, cell, CellCoords::Direction::right, color);;
-            }
-        } else {
-            if (row < mSize) {
-                if (!topFirst)
-                    addToListIfNotVisited(row + 1, num + 1, neighbours, cell, CellCoords::Direction::right, color);;
-                if (row > 0 && num < mBoard[row]->size() - 1)
-                    addToListIfNotVisited(row - 1, num, neighbours, cell, CellCoords::Direction::right, color);;
-                if (topFirst)
-                    addToListIfNotVisited(row + 1, num + 1, neighbours, cell, CellCoords::Direction::right, color);;
-            } else {
-                if (!topFirst && row < mBoard.size() - 1 && num < mBoard[row]->size() - 1)
-                    addToListIfNotVisited(row + 1, num, neighbours, cell, CellCoords::Direction::right, color);;
-                addToListIfNotVisited(row - 1, num + 1, neighbours, cell, CellCoords::Direction::right, color);;
-                if (topFirst && row < mBoard.size() - 1 && num < mBoard[row]->size() - 1)
-                    addToListIfNotVisited(row + 1, num, neighbours, cell, CellCoords::Direction::right, color);;
-            }
-        }
     }
 
 
@@ -580,10 +465,16 @@ namespace board {
         }
     }
 
-    void Board::addToListIfNotVisited(size_t row, size_t num, List <CellCoords> &list, Cell *parent,
-                                      CellCoords::Direction direction, CellType color) const {
-        if (!visited(row, num) && getCell(row, num)->getType() == color)
-            list.pushBack({row, num, parent, direction});
+    void Board::fillEmptyCellsCoordsList(List <CellCoords> &emptyCellsCoords,
+                                         const Board::CellDistanceEvaluator *evaluator) const {
+        for (size_t row = 0u; row < mBoard.size(); ++row) {
+            for (size_t num = 0u; num < mBoard[row]->size(); ++num) {
+                auto *cell = getCell(row, num);
+                if (cell->getType() == Cell::Type::empty)
+                    if (!evaluator || (*evaluator)(cell))
+                        emptyCellsCoords.pushBack({row, num});
+            }
+        }
     }
 
     void Board::clearVisited() {

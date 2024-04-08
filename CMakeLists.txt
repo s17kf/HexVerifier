@@ -15,6 +15,7 @@ set(MAIN_SOURCES
         board/src/Board.cpp
         board/src/BoardParser.cpp
         board/src/HexVerifier.cpp
+        board/src/NeighboursGenerators.cpp
         utils/src/String.cpp
         utils/src/InputReaderImpl.cpp
 )
