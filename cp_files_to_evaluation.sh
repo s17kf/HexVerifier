@@ -17,11 +17,13 @@ files_to_cp=(
 "board/include/DoneVerifiers.h"
 "board/include/WinVerifiers.h"
 "board/include/NeighboursGenerators.h"
+"board/include/BoardStateUtils.h"
 "board/src/Board.cpp"
 "board/src/BoardParser.cpp"
 "board/src/Cell.cpp"
 "board/src/HexVerifier.cpp"
 "board/src/NeighboursGenerators.cpp"
+"board/src/BoardStateUtils.cpp"
 
 "utils/include/InputReader.h"
 "utils/include/InputReaderImpl.h"

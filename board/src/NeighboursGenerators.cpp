@@ -4,6 +4,7 @@
 
 #include "NeighboursGenerators.h"
 #include "Board.h"
+#include "BoardStateUtils.h"
 
 using data_structures::List;
 
@@ -42,6 +43,50 @@ namespace board {
         addNeighboursOnRight(row, num, cell, CellType::blue, neighbours, emptyAllowed, false);
         if (cellCoords.direction == CellCoords::Direction::right)
             addNeighbourAbove(row, num, cell, CellType::blue, neighbours, emptyAllowed);
+    }
+
+    void RedNeighboursGenerator::fillFirstLine(List <CellCoords> &neighbours) const {
+        for (size_t row = 0u; row < mBoard.getSize(); ++row) {
+            if (mBoard.getCell(row, 0)->getType() == Cell::Type::red)
+                neighbours.pushBack({row, 0, &mBoard.mRedBoarderLeft, CellCoords::Direction::right});
+        }
+    }
+
+    void BlueNeighboursGenerator::fillFirstLine(List <CellCoords> &neighbours) const {
+        for (size_t row = 0u; row < mBoard.getSize(); ++row) {
+            if (mBoard.getLastCellInRow(row)->getType() == Cell::Type::blue)
+                neighbours.pushBack(
+                        {row, mBoard.cells(row) - 1, &mBoard.mBlueBoarderRight, CellCoords::Direction::left});
+        }
+    }
+
+    void RedNeighboursGenerator::fillLastLine(List <CellCoords> &neighbours) const {
+        for (size_t row = mBoard.getSize() - 1; row < mBoard.rows(); ++row) {
+            if (mBoard.getLastCellInRow(row)->getType() == Cell::Type::red)
+                neighbours.pushBack(
+                        {row, mBoard.cells(row) - 1, &mBoard.mRedBoarderRight, CellCoords::Direction::left});
+        }
+    }
+
+    void BlueNeighboursGenerator::fillLastLine(List <CellCoords> &neighbours) const {
+        for (size_t row = mBoard.getSize() - 1; row < mBoard.rows(); ++row) {
+            if (mBoard.getCell(row, 0)->getType() == Cell::Type::blue)
+                neighbours.pushBack({row, 0, &mBoard.mBlueBoarderLeft, CellCoords::Direction::right});
+        }
+    }
+
+    void RedNeighboursGenerator::fillStartLeafs(List <CellCoords> &neighbours,
+                                                const BoardStateUtils &boardStateUtils) const {
+        for (const auto &coords: boardStateUtils.getRedStartLeafs()) {
+            neighbours.pushBack(coords);
+        }
+    }
+
+    void BlueNeighboursGenerator::fillStartLeafs(List <CellCoords> &neighbours,
+                                                 const BoardStateUtils &boardStateUtils) const {
+        for (const auto &coords: boardStateUtils.getBlueStartLeafs()) {
+            neighbours.pushBack(coords);
+        }
     }
 
     void NeighboursGenerator::addNeighbourBelow(

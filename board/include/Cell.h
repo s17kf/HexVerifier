@@ -22,17 +22,25 @@ namespace board {
             blueBorderLeft,
         };
 
-        explicit Cell(Type mType = Type::empty) : mType(mType) {}
+        explicit Cell(Type type = Type::empty) : mType(type), mTemporaryColor(true) {}
 
-        constexpr Type getType() const {
+        inline bool isTemporary() const {
+            return mTemporaryColor;
+        }
+
+        inline void markNotTemporary() {
+            mTemporaryColor = false;
+        }
+
+        inline Type getType() const {
             return mType;
         }
 
-        void setType(Type type) {
+        inline void setType(Type type) {
             Cell::mType = type;
         }
 
-        constexpr const data_structures::List<Cell *> &getNeighbours() const {
+        inline const data_structures::List<Cell *> &getNeighbours() const {
             return mNeighbours;
         }
 
@@ -44,9 +52,12 @@ namespace board {
         Cell* parent = nullptr;
         size_t closestBlue = SIZE_MAX;
         size_t closestRed = SIZE_MAX;
+        bool isStartLeaf = false;
+        bool isEndLeaf = false;
     private:
         Type mType;
         data_structures::List<Cell *> mNeighbours;
+        bool mTemporaryColor;
     };
 
 } // board

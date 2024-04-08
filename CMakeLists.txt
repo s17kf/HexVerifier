@@ -16,6 +16,7 @@ set(MAIN_SOURCES
         board/src/BoardParser.cpp
         board/src/HexVerifier.cpp
         board/src/NeighboursGenerators.cpp
+        board/src/BoardStateUtils.cpp
         utils/src/String.cpp
         utils/src/InputReaderImpl.cpp
 )
@@ -35,9 +36,10 @@ set(BOARD_TEST_SOURCES
         board/src/Board.cpp
         board/src/BoardParser.cpp
         board/src/HexVerifier.cpp
+        board/src/NeighboursGenerators.cpp
+        board/src/BoardStateUtils.cpp
         board/tests/BoardTest.cpp
         board/tests/BoardParserTest.cpp
-        board/src/NeighboursGenerators.cpp
 )
 
 set(DATA_STRUCTURES_TEST_SOURCES

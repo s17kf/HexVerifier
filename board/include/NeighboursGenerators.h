@@ -7,20 +7,29 @@
 
 #include "List.h"
 #include "CellCoords.h"
+#include "NeighboursGenerators.h"
 
 namespace board {
     class Board;
+    class BoardStateUtils;
 
     class NeighboursGenerator {
     public:
         typedef Cell::Type CellType;
 
-        explicit NeighboursGenerator(const Board &mBoard) : mBoard(mBoard) {}
+        explicit NeighboursGenerator(Board &mBoard) : mBoard(mBoard) {}
 
         virtual ~NeighboursGenerator() = default;
 
         virtual void fill(data_structures::List<CellCoords> &neighbours,
                           CellCoords cellCoords, bool emptyAllowed) const = 0;
+
+        virtual void fillFirstLine(data_structures::List<CellCoords> &neighbours) const = 0;
+
+        virtual void fillLastLine(data_structures::List<CellCoords> &neighbours) const = 0;
+
+        virtual void fillStartLeafs(
+                data_structures::List<CellCoords> &neighbours, const BoardStateUtils &boardStateUtils) const = 0;
 
         data_structures::List<CellCoords> get(
                 const CellCoords &cellCoords, bool emptyAllowed) const;
@@ -45,23 +54,37 @@ namespace board {
                 CellCoords::Direction direction, CellType color, bool emptyAllowed) const;
 
 
-        const Board &mBoard;
+        Board &mBoard;
     };
 
     class RedNeighboursGenerator : public NeighboursGenerator {
     public:
-        explicit RedNeighboursGenerator(const Board &mBoard) : NeighboursGenerator(mBoard) {}
+        explicit RedNeighboursGenerator(Board &mBoard) : NeighboursGenerator(mBoard) {}
 
         void fill(data_structures::List<CellCoords> &neighbours, CellCoords cellCoords,
                   bool emptyAllowed) const override;
+
+        void fillFirstLine(data_structures::List<CellCoords> &neighbours) const override;
+
+        void fillLastLine(data_structures::List<CellCoords> &neighbours) const override;
+
+        void fillStartLeafs(
+                data_structures::List<CellCoords> &neighbours, const BoardStateUtils &boardStateUtils) const override;
     };
 
     class BlueNeighboursGenerator : public NeighboursGenerator {
     public:
-        explicit BlueNeighboursGenerator(const Board &mBoard) : NeighboursGenerator(mBoard) {}
+        explicit BlueNeighboursGenerator(Board &mBoard) : NeighboursGenerator(mBoard) {}
 
         void fill(data_structures::List<CellCoords> &neighbours, CellCoords cellCoords,
                   bool emptyAllowed) const override;
+
+        void fillFirstLine(data_structures::List<CellCoords> &neighbours) const override;
+
+        void fillLastLine(data_structures::List<CellCoords> &neighbours) const override;
+
+        void fillStartLeafs(
+                data_structures::List<CellCoords> &neighbours, const BoardStateUtils &boardStateUtils) const override;
     };
 
 } // board

@@ -16,7 +16,7 @@ namespace board {
         static void handleInput(utils::InputReader &inputReader);
     private:
         static void handleBoard(utils::InputReader &inputReader);
-        static void handleQuery(utils::String *query, Board *board);
+        static void handleQuery(utils::String *query, Board *board, const BoardStateUtils &boardStateUtils);
     };
 
 } // board

@@ -15,6 +15,10 @@ namespace board {
 
     class DoneVerifier;
 
+    class RedDoneVerifier;
+
+    class BlueDoneVerifier;
+
     class WinVerifier;
 
     class RedWinVerifier;
@@ -22,6 +26,12 @@ namespace board {
     class BlueWinVerifier;
 
     class NeighboursGenerator;
+
+    class RedNeighboursGenerator;
+
+    class BlueNeighboursGenerator;
+
+    class BoardStateUtils;
 
 
     class Board {
@@ -69,15 +79,15 @@ namespace board {
 
         bool isBoardPossible();
 
-        bool isRedWin();
+        bool isWin(CellType color);
 
-        bool isBlueWin();
+        bool isWon(CellType color, const BoardStateUtils &boardStateUtils);
 
         bool canRedWinInNMoves(size_t n);
 
         bool canBlueWinInNMoves(size_t n);
 
-        bool canRedWinInNMovesWithPerfectOpponent(size_t n);
+        bool canRedWinInNMovesWithPerfectOpponent(size_t n, const BoardStateUtils &boardStateUtils);
 
     private:
         struct CellParent {
@@ -85,29 +95,36 @@ namespace board {
             Cell *parent;
         };
 
+        enum class minMaxType {
+            min,
+            max
+        };
+
         class CellDistanceEvaluator {
         public:
+            virtual ~CellDistanceEvaluator() = default;
+
             virtual bool operator()(const Cell *cell) const = 0;
         };
 
-        class CellRedDistanceEvaluator : public CellDistanceEvaluator {
+        class RedCellDistanceEvaluator : public CellDistanceEvaluator {
         public:
-            explicit CellRedDistanceEvaluator(size_t allowedDistance) : allowedDistance(allowedDistance) {}
+            explicit RedCellDistanceEvaluator(size_t allowedDistance) : allowedDistance(allowedDistance) {}
 
             bool operator()(const Cell *cell) const override {
-                return cell->closestRed <= allowedDistance;
+                return cell->closestRed < 2;
             }
 
         private:
             size_t allowedDistance;
         };
 
-        class CellBlueDistanceEvaluator : public CellDistanceEvaluator {
+        class BlueCellDistanceEvaluator : public CellDistanceEvaluator {
         public:
-            explicit CellBlueDistanceEvaluator(size_t allowedDistance) : allowedDistance(allowedDistance) {}
+            explicit BlueCellDistanceEvaluator(size_t allowedDistance) : allowedDistance(allowedDistance) {}
 
             bool operator()(const Cell *cell) const override {
-                return cell->closestBlue <= allowedDistance;
+                return cell->closestBlue < 2;
             }
 
         private:
@@ -122,8 +139,7 @@ namespace board {
                  const std::function<bool(const Board &, size_t, size_t)> &done,
                  const std::function<data_structures::List<CellCoords>(const Board &, size_t, size_t)> &getNeighbours);
 
-        bool dfs(const data_structures::List<CellCoords> &nexts,
-                 CellType color,
+        bool dfs(CellType color,
                  Cell &endBorder,
                  const DoneVerifier &doneVerifier,
                  const NeighboursGenerator &neighboursGenerator);
@@ -133,6 +149,17 @@ namespace board {
                  Cell &endBorder,
                  const DoneVerifier &doneVerifier,
                  const NeighboursGenerator &neighboursGenerator);
+
+        bool dfs(const BoardStateUtils &boardStateUtils, const DoneVerifier &doneVerifier,
+                 const NeighboursGenerator &neighboursGenerator);
+
+        bool dfs(const CellCoords &cellCoords, const BoardStateUtils &boardStateUtils, const DoneVerifier &doneVerifier,
+                 const NeighboursGenerator &neighboursGenerator);
+
+        int minMaxStateEvaluate(
+                data_structures::List<CellCoords> &emptyCells, minMaxType playerType, CellType playerColor,
+                size_t stepsLeft, size_t checkedMoves, const CellDistanceEvaluator &cellDistanceEvaluator,
+                const BoardStateUtils &boardStateUtils);
 
         void incColorCount(Cell::Type color);
 
@@ -146,7 +173,11 @@ namespace board {
             return getCell(row, num)->visited;
         }
 
-        void clearVisited();
+        inline size_t getNeededEmptyCellsCount(CellType playerToCheck, size_t neededMoves) const;
+
+        inline CellType currentPlayer() const;
+
+        void clearVisited() const;
 
         void visitParents(const Cell *lastChild, const Cell *greatParent);
 
@@ -171,9 +202,19 @@ namespace board {
 
         friend class NeighboursGenerator;
 
+        friend class RedNeighboursGenerator;
+
+        friend class BlueNeighboursGenerator;
+
         friend class RedWinVerifier;
 
         friend class BlueWinVerifier;
+
+        friend class BoardStateUtils;
+
+        friend class RedDoneVerifier;
+
+        friend class BlueDoneVerifier;
     };
 
 } // board

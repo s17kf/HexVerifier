@@ -12,31 +12,43 @@ namespace board {
 
     class DoneVerifier {
     public:
+        virtual ~DoneVerifier() {}
+
         virtual bool operator()(const CellCoords &cellCoords) const = 0;
+
+        virtual Cell *getEndBorder() const = 0;
     };
 
     class RedDoneVerifier : public DoneVerifier {
     public:
-        explicit RedDoneVerifier(const Board &mBoard) : mBoard(mBoard) {}
+        explicit RedDoneVerifier(Board &board) : mBoard(board) {}
 
         bool operator()(const CellCoords &cellCoords) const override {
             return cellCoords.row >= mBoard.getSize() - 1 && cellCoords.num == mBoard.cells(cellCoords.row) - 1;
         }
 
+        Cell *getEndBorder() const override {
+            return &mBoard.mRedBoarderRight;
+        }
+
     private:
-        const Board &mBoard;
+        Board &mBoard;
     };
 
     class BlueDoneVerifier : public DoneVerifier {
     public:
-        explicit BlueDoneVerifier(const Board &mBoard) : mBoard(mBoard) {}
+        explicit BlueDoneVerifier(Board &board) : mBoard(board) {}
 
         bool operator()(const CellCoords &cellCoords) const override {
             return cellCoords.row >= mBoard.getSize() - 1 && cellCoords.num == 0;
         }
 
+        Cell *getEndBorder() const override {
+            return &mBoard.mBlueBoarderLeft;
+        }
+
     private:
-       const  Board &mBoard;
+        Board &mBoard;
     };
 
 } // board

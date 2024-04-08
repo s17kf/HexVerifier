@@ -10,12 +10,13 @@
 #include "BoardParser.h"
 #include "String.h"
 #include "WinVerifiers.h"
+#include "BoardStateUtils.h"
 
 using utils::String;
 
 namespace board {
 
-    void HexVerifier::handleQuery(utils::String *query, Board *board) {
+    void HexVerifier::handleQuery(utils::String *query, Board *board, const BoardStateUtils &boardStateUtils) {
         if (*query == "BOARD_SIZE") {
             printf("%lu\n", board->getSize());
             return;
@@ -38,11 +39,11 @@ namespace board {
                 printf("NO\n");
                 return;
             }
-            if (board->isRedWin()) {
+            if (board->isWin(Cell::Type::red)) {
                 printf("YES RED\n");
                 return;
             }
-            if (board->isBlueWin()) {
+            if (board->isWin(Cell::Type::blue)) {
                 printf("YES BLUE\n");
                 return;
             }
@@ -59,7 +60,7 @@ namespace board {
         }
         auto splittedQuery = query->split('_');
         auto wordIt = splittedQuery.begin();
-        if(*(wordIt++) != "CAN") {
+        if (*(wordIt++) != "CAN") {
             printf("%s: query is NOT SUPPORTED!\n", query->c_str());
             return;
         }
@@ -72,16 +73,24 @@ namespace board {
         ++wordIt; // skip 'MOVE(S)'
         ++wordIt; // skip 'WITH'
         String &opponentType = *wordIt;
-        if(opponentType == "NAIVE") {
-            if(color == "RED"){
+        if (opponentType == "NAIVE") {
+            if (color == "RED") {
                 if (board->canRedWinInNMoves(moves))
                     printf("YES\n");
                 else
                     printf("NO\n");
                 return;
             }
-            if(color == "BLUE"){
+            if (color == "BLUE") {
                 if (board->canBlueWinInNMoves(moves))
+                    printf("YES\n");
+                else
+                    printf("NO\n");
+                return;
+            }
+        } else {
+            if (color == "RED") {
+                if (board->canRedWinInNMovesWithPerfectOpponent(moves, boardStateUtils))
                     printf("YES\n");
                 else
                     printf("NO\n");
@@ -97,6 +106,7 @@ namespace board {
         Board *board = boardParser.generateBoard();
         if (board == nullptr)
             return;
+        BoardStateUtils boardStateUtils(*board);
 
         String *lastLine = inputReader.getLine();
         while (!inputReader.eof() && *lastLine != boardParser.BOARD_DELIMITER) {
@@ -105,7 +115,7 @@ namespace board {
                 lastLine = inputReader.getLine();
                 continue;
             }
-            handleQuery(lastLine, board);
+            handleQuery(lastLine, board, boardStateUtils);
             printf("\n");
             delete lastLine;
             lastLine = inputReader.getLine();

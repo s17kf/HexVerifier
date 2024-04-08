@@ -6,6 +6,9 @@
 #include "DoneVerifiers.h"
 #include "WinVerifiers.h"
 #include "NeighboursGenerators.h"
+#include "BoardStateUtils.h"
+
+#include <climits>
 
 
 using data_structures::Vector;
@@ -84,12 +87,15 @@ namespace board {
         if (type > Cell::Type::blue) {
             throw std::invalid_argument("Try to set not allowed type of cell (boarder type used)!");
         }
-        if (getCell(row, cellNum)->getType() != Cell::Type::empty)
+        auto *cell = getCell(row, cellNum);
+        if ( cell->getType() != Cell::Type::empty)
             decColorCount(getCell(row, cellNum)->getType());
         if (type != Cell::Type::empty)
             incColorCount(type);
 
-        mBoard[row]->at(cellNum)->setType(type);
+        cell->setType(type);
+        cell->markNotTemporary();
+//        mBoard[row]->at(cellNum) = new Cell(type);
     }
 
     size_t Board::getColorCount(Cell::Type color) const {
@@ -146,45 +152,57 @@ namespace board {
             return false;
         auto redPawns = getColorCount(Cell::Type::red);
         auto bluePawns = getColorCount(Cell::Type::blue);
-        if (isRedWin()) {
+        if (isWin(CellType::red)) {
             if (bluePawns == redPawns) {
                 return false;
             }
             clearVisited();
             visitParents(&mRedBoarderRight, &mRedBoarderLeft);
-            return !isRedWin();
+            return !isWin(CellType::red);
         }
-        if (isBlueWin()) {
+        if (isWin(CellType::blue)) {
             if (bluePawns < redPawns) {
                 return false;
             }
             clearVisited();
             visitParents(&mBlueBoarderLeft, &mBlueBoarderRight);
-            return !isBlueWin();
+            return !isWin(CellType::blue);
         }
         return true;
     }
 
-    bool Board::isRedWin() {
-        List<CellCoords> nexts;
-        for (size_t row = 0u; row < mSize; ++row) {
-            if (mBoard[row]->at(0)->getType() == Cell::Type::red)
-                nexts.pushBack({row, 0, &mRedBoarderLeft, CellCoords::Direction::right});
+    bool Board::isWin(Board::CellType color) {
+        switch (color) {
+            case Cell::Type::red: {
+                RedDoneVerifier doneVerifier(*this);
+                RedNeighboursGenerator neighboursGenerator(*this);
+                return dfs(Cell::Type::red, mRedBoarderRight, doneVerifier, neighboursGenerator);
+            }
+            case Cell::Type::blue: {
+                BlueDoneVerifier doneVerifier(*this);
+                BlueNeighboursGenerator neighboursGenerator(*this);
+                return dfs(Cell::Type::blue, mBlueBoarderLeft, doneVerifier, neighboursGenerator);
+            }
+            default:
+                throw std::invalid_argument("Only blue and red colors are allowed for win verification");
         }
-        RedDoneVerifier doneVerifier(*this);
-        RedNeighboursGenerator neighboursGenerator(*this);
-        return dfs(nexts, Cell::Type::red, mRedBoarderRight, doneVerifier, neighboursGenerator);
     }
 
-    bool Board::isBlueWin() {
-        List<CellCoords> nexts;
-        for (size_t row = 0u; row < mSize; ++row) {
-            if (mBoard[row]->last()->getType() == Cell::Type::blue)
-                nexts.pushBack({row, mBoard[row]->size() - 1, &mBlueBoarderRight, CellCoords::Direction::left});
+    bool Board::isWon(Board::CellType color, const BoardStateUtils &boardStateUtils) {
+        switch (color) {
+            case Cell::Type::red: {
+                RedDoneVerifier doneVerifier(*this);
+                RedNeighboursGenerator neighboursGenerator(*this);
+                return dfs(boardStateUtils, doneVerifier, neighboursGenerator);
+            }
+            case Cell::Type::blue: {
+                BlueDoneVerifier doneVerifier(*this);
+                BlueNeighboursGenerator neighboursGenerator(*this);
+                return dfs(boardStateUtils, doneVerifier, neighboursGenerator);
+            }
+            default:
+                throw std::invalid_argument("Only blue and red colors are allowed for win verification");
         }
-        BlueDoneVerifier doneVerifier(*this);
-        BlueNeighboursGenerator neighboursGenerator(*this);
-        return dfs(nexts, Cell::Type::blue, mBlueBoarderLeft, doneVerifier, neighboursGenerator);
     }
 
     bool Board::canRedWinInNMoves(size_t n) {
@@ -207,20 +225,26 @@ namespace board {
         return canWin(n, Cell::Type::blue, emptyCellsCoords, winVerifier);
     }
 
-    bool Board::canRedWinInNMovesWithPerfectOpponent(size_t n) {
+    bool Board::canRedWinInNMovesWithPerfectOpponent(size_t n, const BoardStateUtils &boardStateUtils) {
         CellType color = Cell::Type::red;
         if (!isBoardCorrect() || !enoughEmptyCells(color, n) || isGameWonBySomeone()) {
             return false;
         }
         // calculate distances for empty cells
         List<CellCoords> nexts;
-        for (size_t row = 0u; row < mSize; ++row) {
-            nexts.pushBack({row, 0, &mRedBoarderLeft});
-        }
-        for (size_t row = mSize - 1; row < mBoard.size(); ++row) {
-            nexts.pushBack({row, mBoard[row]->size() - 1, &mRedBoarderLeft});
-        }
+//        for (size_t row = 0u; row < mSize; ++row) {
+//            nexts.pushBack({row, 0, &mRedBoarderLeft});
+//        }
+//        for (size_t row = mSize - 1; row < mBoard.size(); ++row) {
+//            nexts.pushBack({row, mBoard[row]->size() - 1, &mRedBoarderRight});
+//        }
         RedNeighboursGenerator neighboursGenerator(*this);
+        for (const auto &coords: boardStateUtils.getRedStartLeafs()) {
+            nexts.pushBack(coords);
+        }
+        for (const auto &coords: boardStateUtils.getRedEndLeafs()) {
+            nexts.pushBack(coords);
+        }
         while (!nexts.empty()) {
             auto coords = nexts.popFront();
             auto cell = getCell(coords);
@@ -230,33 +254,89 @@ namespace board {
             if (cell->getType() == color) {
                 cell->closestRed = 0;
             } else if (cell->getType() == Cell::Type::empty) {
-                cell->closestRed = cell->parent->closestRed + 1;
+                cell->closestRed = coords.parent->closestRed + 1;
             }
             neighboursGenerator.fill(nexts, coords, true);
         }
         clearVisited();
+        // TODO: calculate distances for blue cells as well??
 
-        List<CellCoords> emptyCellsToPlay;
-        CellRedDistanceEvaluator cellRedDistanceEvaluator(n);
-        fillEmptyCellsCoordsList(emptyCellsToPlay, &cellRedDistanceEvaluator);
+        List<CellCoords> emptyCells;
+        fillEmptyCellsCoordsList(emptyCells);
+        RedCellDistanceEvaluator redCellDistanceEvaluator(n);
+        size_t stepsLeft = getNeededEmptyCellsCount(color, n);
+        if (currentPlayer() == color) {
+            return minMaxStateEvaluate(emptyCells, minMaxType::max, color, stepsLeft, n,
+                                       redCellDistanceEvaluator, boardStateUtils);
+        } else {
+            CellType opponent = color == Cell::Type::red ? CellType::blue : CellType::red;
+            return minMaxStateEvaluate(emptyCells, minMaxType::min, opponent, stepsLeft, n,
+                                       redCellDistanceEvaluator, boardStateUtils);
+        }
 
+    }
 
-        return false;
+    int Board::minMaxStateEvaluate(
+            List <CellCoords> &emptyCells, minMaxType playerType, Board::CellType playerColor, size_t stepsLeft,
+            size_t checkedMoves, const CellDistanceEvaluator &cellDistanceEvaluator,
+            const BoardStateUtils &boardStateUtils) {
+        minMaxType opponentType = playerType == minMaxType::min ? minMaxType::max : minMaxType::min;
+        CellType opponentColor = playerColor == Cell::Type::blue ? Cell::Type::red : Cell::Type::blue;
+        if (stepsLeft == 0) {
+            if (isWon(opponentColor, boardStateUtils)) {
+                clearVisited();
+                return INT_MAX;
+            }
+            clearVisited();
+            if (isWon(playerColor, boardStateUtils)) {
+                clearVisited();
+                return INT_MIN;
+            }
+            clearVisited();
+            return 0;
+        }
+
+        int bestValue = 0;
+        for (size_t loopsLeft = emptyCells.size(); loopsLeft > 0; --loopsLeft) {
+            CellCoords cellCoords = emptyCells.popFront();
+//            if cellCoords.
+            auto *cell = getCell(cellCoords);
+            cell->setType(playerColor);
+            if (playerType == minMaxType::min || cellDistanceEvaluator(cell)) {
+                int newValue = minMaxStateEvaluate(emptyCells, opponentType, opponentColor, stepsLeft - 1,
+                                                   checkedMoves, cellDistanceEvaluator, boardStateUtils);
+                if (playerType == minMaxType::min) {
+                    if (newValue < bestValue)
+                        bestValue = newValue;
+                } else {
+                    if (newValue > bestValue)
+                        bestValue = newValue;
+                }
+            }
+            cell->setType(Cell::Type::empty);
+            emptyCells.pushBack(cellCoords);
+        }
+        return bestValue;
     }
 
     bool Board::enoughEmptyCells(CellType playerToCheck, size_t neededMoves) const {
-        size_t neededEmptyCells;
+        size_t neededEmptyCells = getNeededEmptyCellsCount(playerToCheck, neededMoves);
+        return getColorCount(Cell::Type::empty) >= neededEmptyCells;
+    }
+
+    size_t Board::getNeededEmptyCellsCount(Board::CellType playerToCheck, size_t neededMoves) const {
         switch (playerToCheck) {
             case Cell::Type::red:
-                neededEmptyCells = redCellsCount > blueCellsCount ? 2 * neededMoves : 2 * neededMoves - 1;
-                break;
+                return redCellsCount > blueCellsCount ? 2 * neededMoves : 2 * neededMoves - 1;
             case Cell::Type::blue:
-                neededEmptyCells = redCellsCount > blueCellsCount ? 2 * neededMoves - 1 : 2 * neededMoves;
-                break;
+                return redCellsCount > blueCellsCount ? 2 * neededMoves - 1 : 2 * neededMoves;
             default:
                 throw std::invalid_argument("Can check empty cells count for red or blue only");
         }
-        return getColorCount(Cell::Type::empty) >= neededEmptyCells;
+    }
+
+    Board::CellType Board::currentPlayer() const {
+        return redCellsCount == blueCellsCount ? Cell::Type::red : Board::CellType::blue;
     }
 
     bool Board::canWin(size_t movesLeft, CellType color, List <CellCoords> &emptyCellsCoords,
@@ -337,8 +417,10 @@ namespace board {
         return false;
     }
 
-    bool Board::dfs(const List <CellCoords> &nexts, Board::CellType color, Cell &endBorder,
-                    const DoneVerifier &doneVerifier, const NeighboursGenerator &neighboursGenerator) {
+    bool Board::dfs(Board::CellType color, Cell &endBorder, const DoneVerifier &doneVerifier,
+                    const NeighboursGenerator &neighboursGenerator) {
+        List<CellCoords> nexts;
+        neighboursGenerator.fillFirstLine(nexts);
         for (const auto nextCoords: nexts) {
             auto *cell = getCell(nextCoords.row, nextCoords.num);
             if (cell->visited || cell->getType() != color)
@@ -352,7 +434,7 @@ namespace board {
         return false;
     }
 
-    bool Board::dfs(const CellCoords &cellCoords, Board::CellType color, Cell &endBorder,
+    bool Board::dfs(const CellCoords &cellCoords, CellType color, Cell &endBorder,
                     const DoneVerifier &doneVerifier, const NeighboursGenerator &neighboursGenerator) {
         auto *cell = getCell(cellCoords.row, cellCoords.num);
         cell->parent = cellCoords.parent;
@@ -364,6 +446,50 @@ namespace board {
         for (auto &nextCoords: neighboursGenerator.get(cellCoords, false)) {
             if (dfs(nextCoords, color, endBorder, doneVerifier, neighboursGenerator))
                 return true;
+        }
+        return false;
+    }
+
+    bool Board::dfs(const BoardStateUtils &boardStateUtils, const DoneVerifier &doneVerifier,
+                    const NeighboursGenerator &neighboursGenerator) {
+        List<CellCoords> nexts;
+        neighboursGenerator.fillStartLeafs(nexts, boardStateUtils);
+        for (const auto &coors: nexts) {
+            auto *cell = getCell(coors);
+            if (cell->visited)
+                continue;
+            if (dfs(coors, boardStateUtils, doneVerifier, neighboursGenerator)) {
+                clearVisited();
+                return true;
+            }
+        }
+        clearVisited();
+        return false;
+    }
+
+    bool Board::dfs(const CellCoords &cellCoords, const BoardStateUtils &boardStateUtils,
+                    const DoneVerifier &doneVerifier, const NeighboursGenerator &neighboursGenerator) {
+        auto *cell = getCell(cellCoords.row, cellCoords.num);
+        cell->parent = cellCoords.parent;
+        cell->visited = true;
+        if (cell->isEndLeaf) {
+            return true;
+        }
+        if (doneVerifier(cellCoords)) {
+            doneVerifier.getEndBorder()->parent = cell;
+            return true;
+        }
+        for (const auto &nextCoords: neighboursGenerator.get(cellCoords, false)) {
+            auto *nextCell = getCell(nextCoords);
+            if (!nextCell->isTemporary()) {
+                if(nextCell->isEndLeaf || doneVerifier(cellCoords)) {
+                    return true;
+                }
+                continue;
+            }
+            if (dfs(nextCoords, boardStateUtils, doneVerifier, neighboursGenerator)) {
+                return true;
+            }
         }
         return false;
     }
@@ -478,7 +604,7 @@ namespace board {
         }
     }
 
-    void Board::clearVisited() {
+    void Board::clearVisited() const {
         for (auto *row: mBoard) {
             for (auto *cell: *row) {
                 cell->visited = false;
