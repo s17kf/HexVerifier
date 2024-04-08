@@ -9,6 +9,7 @@
 #include "Board.h"
 #include "BoardParser.h"
 #include "String.h"
+#include "WinVerifiers.h"
 
 using utils::String;
 

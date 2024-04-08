@@ -5,6 +5,7 @@
 #include "Board.h"
 #include "DoneVerifiers.h"
 #include "WinVerifiers.h"
+#include "NeighboursGenerators.h"
 
 
 using data_structures::Vector;

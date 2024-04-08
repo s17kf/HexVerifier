@@ -8,7 +8,6 @@
 #include "Cell.h"
 #include "Vector.h"
 #include "CellCoords.h"
-#include "NeighboursGenerators.h"
 
 #include <functional>
 
@@ -21,6 +20,9 @@ namespace board {
     class RedWinVerifier;
 
     class BlueWinVerifier;
+
+    class NeighboursGenerator;
+
 
     class Board {
     public:

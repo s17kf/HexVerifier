@@ -37,6 +37,7 @@ set(BOARD_TEST_SOURCES
         board/src/HexVerifier.cpp
         board/tests/BoardTest.cpp
         board/tests/BoardParserTest.cpp
+        board/src/NeighboursGenerators.cpp
 )
 
 set(DATA_STRUCTURES_TEST_SOURCES
