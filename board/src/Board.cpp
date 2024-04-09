@@ -53,14 +53,28 @@ namespace board {
         return true;
     }
 
-    bool Board::isGameWonByRed() const {
-        List<CellCoords> path;
-        return isGameWonByRed(path);
+    bool Board::isGameWonByRed(const DistancesKeeper &distancesKeeper) const {
+        return isGameWonByRed(distancesKeeper.getDistancesToRightBorder());
     }
 
-    bool Board::isGameWonByBlue() const {
-        List<CellCoords> path;
-        return isGameWonByBlue(path);
+    bool Board::isGameWonByBlue(const DistancesKeeper &distancesKeeper) const {
+        return isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder());
+    }
+
+    bool Board::isGameWonByRed(const Board::DistancesType &distancesToRightBorder) const {
+        for (size_t row = 0; row < size(); ++row) {
+            if (distancesToRightBorder[row][0] == 0)
+                return true;
+        }
+        return false;
+    }
+
+    bool Board::isGameWonByBlue(const Board::DistancesType &distancesTpBottomBorder) const {
+        for (size_t num = 0; num < size(); ++num) {
+            if (distancesTpBottomBorder[0][num] == 0)
+                return true;
+        }
+        return false;
     }
 
     bool Board::isGameWonByRed(List<CellCoords> &path) const {
@@ -102,12 +116,20 @@ namespace board {
     }
 
     bool Board::canRedWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper) {
+        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
+            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+            return false;
+        }
         bool movesFirst = mRedCellsCount == mBlueCellsCount;
         return canWinInNMovesWithNaive(n, movesFirst, distancesKeeper.getDistancesToLeftBorder(),
                                        distancesKeeper.getDistancesToRightBorder());
     }
 
     bool Board::canBlueWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper) {
+        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
+            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+            return false;
+        }
         bool movesFirst = mRedCellsCount > mBlueCellsCount;
         return canWinInNMovesWithNaive(n, movesFirst, distancesKeeper.getDistancesToTopBorder(),
                                        distancesKeeper.getDistancesToBottomBorder());
@@ -116,9 +138,7 @@ namespace board {
     bool Board::canWinInNMovesWithNaive(size_t n, bool movesFirst, const Board::DistancesType &distancesToFirstBorder,
                                         const Board::DistancesType &distancesToSecondBorder) {
         size_t neededEmptyCells = movesFirst ? 2 * n - 1 : 2 * n;
-        if (neededEmptyCells > getColorCount(Cell::Type::empty))
-            return false;
-        if (!isBoardCorrect() || isGameWonByRed() || isGameWonByBlue())
+        if (neededEmptyCells > getColorCount(Cell::Type::empty) || !isBoardCorrect())
             return false;
         List<CellCoords *> emptyCells;
         fillEmptyCells(emptyCells);
@@ -141,6 +161,7 @@ namespace board {
             }
             return winningCellExist;
         }
+
         bool twoMoveWinningCellExist = false;
         bool oneMoveWiningCellExist = false;
         bool idleMoveCellToFirstBorderExist = false;

@@ -37,11 +37,11 @@ namespace board {
                 printf("NO\n");
                 return;
             }
-            if (board->isGameWonByRed()) {
+            if (board->isGameWonByRed(distancesKeeper)) {
                 printf("YES RED\n");
                 return;
             }
-            if (board->isGameWonByBlue()) {
+            if (board->isGameWonByBlue(distancesKeeper)) {
                 printf("YES BLUE\n");
                 return;
             }

@@ -34,11 +34,11 @@ namespace board {
 
         [[nodiscard]] bool isBoardCorrect() const;
 
-        [[nodiscard]] bool isGameWonByRed() const;
+        [[nodiscard]] bool isGameWonByRed(const DistancesKeeper &distancesKeeper) const;
 
-        [[nodiscard]] bool isGameWonByBlue() const;
+        [[nodiscard]] bool isGameWonByBlue(const DistancesKeeper &distancesKeeper) const;
 
-        bool isBoardPossible() const;
+        [[nodiscard]] bool isBoardPossible() const;
 
         bool canRedWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper);
 
@@ -54,6 +54,10 @@ namespace board {
         inline void incColorCount(Cell::Type color);
 
         inline void decColorCount(Cell::Type color);
+
+        [[nodiscard]] inline bool isGameWonByRed(const DistancesType &distancesToRightBorder) const;
+
+        [[nodiscard]] inline bool isGameWonByBlue(const DistancesType &distancesTpBottomBorder) const;
 
         [[nodiscard]] inline bool isGameWonByRed(List<CellCoords> &path) const;
 
