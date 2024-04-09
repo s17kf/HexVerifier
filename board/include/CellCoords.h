@@ -15,10 +15,11 @@ namespace board {
             down,
             left,
             right,
+            upLeft,
+            downRight,
         };
         size_t row;
         size_t num;
-        Cell *parent;
         Direction direction;
     };
 

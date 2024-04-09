@@ -15,11 +15,7 @@ namespace board {
         enum class Type {
             empty,
             red,
-            blue,
-            redBorderRight,
-            redBorderLeft,
-            blueBorderRight,
-            blueBorderLeft,
+            blue
         };
 
         explicit Cell(Type mType = Type::empty) : mType(mType) {}
@@ -32,21 +28,8 @@ namespace board {
             Cell::mType = type;
         }
 
-        constexpr const data_structures::List<Cell *> &getNeighbours() const {
-            return mNeighbours;
-        }
-
-        inline void addNeighbour(Cell *neighbour) {
-            mNeighbours.pushBack(neighbour);
-        }
-
-        bool visited = false;
-        Cell* parent = nullptr;
-        size_t closestBlue = SIZE_MAX;
-        size_t closestRed = SIZE_MAX;
     private:
         Type mType;
-        data_structures::List<Cell *> mNeighbours;
     };
 
 } // board

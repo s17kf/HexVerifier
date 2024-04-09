@@ -45,12 +45,22 @@ namespace data_structures {
             pointer mPtr;
         };
 
+        Vector() : mSize(0) {}
+
         explicit Vector(size_t size) : mSize(size) {
-            data = new T[size];
+            data = new T[size]();
         }
 
         virtual ~Vector() {
             delete[] data;
+        }
+
+        inline Vector &init(size_t size) {
+            if (mSize > 0)
+                throw std::logic_error("Try to init vector again (already initialized!)");
+            mSize = size;
+            data = new T[size]();
+            return *this;
         }
 
         Iterator begin() const {
@@ -65,7 +75,7 @@ namespace data_structures {
             return at(index);
         }
 
-        const T&operator[](size_t index) const {
+        const T &operator[](size_t index) const {
             return at(index);
         }
 
@@ -81,7 +91,7 @@ namespace data_structures {
             throw std::out_of_range("vector operator[] out of range!");
         }
 
-        const T& last() const {
+        const T &last() const {
             return data[size() - 1];
         }
 

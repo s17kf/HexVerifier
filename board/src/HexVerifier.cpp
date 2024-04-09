@@ -9,7 +9,6 @@
 #include "Board.h"
 #include "BoardParser.h"
 #include "String.h"
-#include "WinVerifiers.h"
 
 using utils::String;
 
@@ -17,7 +16,7 @@ namespace board {
 
     void HexVerifier::handleQuery(utils::String *query, Board *board) {
         if (*query == "BOARD_SIZE") {
-            printf("%lu\n", board->getSize());
+            printf("%lu\n", board->size());
             return;
         }
         if (*query == "PAWNS_NUMBER") {
@@ -38,56 +37,56 @@ namespace board {
                 printf("NO\n");
                 return;
             }
-            if (board->isRedWin()) {
+            if (board->isGameWon(Cell::Type::red)) {
                 printf("YES RED\n");
                 return;
             }
-            if (board->isBlueWin()) {
+            if (board->isGameWon(Cell::Type::blue)) {
                 printf("YES BLUE\n");
                 return;
             }
             printf("NO\n");
             return;
         }
-        if (*query == "IS_BOARD_POSSIBLE") {
-            if (board->isBoardPossible()) {
-                printf("YES\n");
-            } else {
-                printf("NO\n");
-            }
-            return;
-        }
-        auto splittedQuery = query->split('_');
-        auto wordIt = splittedQuery.begin();
-        if(*(wordIt++) != "CAN") {
-            printf("%s: query is NOT SUPPORTED!\n", query->c_str());
-            return;
-        }
-        String &color = *wordIt++;
-        ++wordIt; // skip 'WIN'
-        ++wordIt; // skip 'IN'
-        String &movesStr = *wordIt++;
-        int moves;
-        std::from_chars(movesStr.c_str(), movesStr.c_str() + movesStr.size(), moves);
-        ++wordIt; // skip 'MOVE(S)'
-        ++wordIt; // skip 'WITH'
-        String &opponentType = *wordIt;
-        if(opponentType == "NAIVE") {
-            if(color == "RED"){
-                if (board->canRedWinInNMoves(moves))
-                    printf("YES\n");
-                else
-                    printf("NO\n");
-                return;
-            }
-            if(color == "BLUE"){
-                if (board->canBlueWinInNMoves(moves))
-                    printf("YES\n");
-                else
-                    printf("NO\n");
-                return;
-            }
-        }
+//        if (*query == "IS_BOARD_POSSIBLE") {
+//            if (board->isBoardPossible()) {
+//                printf("YES\n");
+//            } else {
+//                printf("NO\n");
+//            }
+//            return;
+//        }
+//        auto splittedQuery = query->split('_');
+//        auto wordIt = splittedQuery.begin();
+//        if(*(wordIt++) != "CAN") {
+//            printf("%s: query is NOT SUPPORTED!\n", query->c_str());
+//            return;
+//        }
+//        String &color = *wordIt++;
+//        ++wordIt; // skip 'WIN'
+//        ++wordIt; // skip 'IN'
+//        String &movesStr = *wordIt++;
+//        int moves;
+//        std::from_chars(movesStr.c_str(), movesStr.c_str() + movesStr.size(), moves);
+//        ++wordIt; // skip 'MOVE(S)'
+//        ++wordIt; // skip 'WITH'
+//        String &opponentType = *wordIt;
+//        if(opponentType == "NAIVE") {
+//            if(color == "RED"){
+//                if (board->canRedWinInNMoves(moves))
+//                    printf("YES\n");
+//                else
+//                    printf("NO\n");
+//                return;
+//            }
+//            if(color == "BLUE"){
+//                if (board->canBlueWinInNMoves(moves))
+//                    printf("YES\n");
+//                else
+//                    printf("NO\n");
+//                return;
+//            }
+//        }
 
         printf("%s: query is not handled yet\n", query->c_str());
     }

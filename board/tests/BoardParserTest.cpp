@@ -31,13 +31,10 @@ protected:
 
 TEST_F(BoardParserTest, boardCreationSetsProperCellTypes) {
     const std::vector<std::vector<Cell::Type>> expectedTypes = {
-            {Cell::Type::empty},
-            {Cell::Type::blue, Cell::Type::empty},
-            {Cell::Type::red, Cell::Type::red, Cell::Type::empty},
-            {Cell::Type::blue, Cell::Type::blue, Cell::Type::empty, Cell::Type::red},
-            {Cell::Type::empty, Cell::Type::red, Cell::Type::blue},
-            {Cell::Type::empty, Cell::Type::red},
-            {Cell::Type::empty},
+            {Cell::Type::empty, Cell::Type::empty, Cell::Type::empty, Cell::Type::red},
+            {Cell::Type::blue,  Cell::Type::red,   Cell::Type::empty, Cell::Type::blue},
+            {Cell::Type::red,   Cell::Type::blue,  Cell::Type::red,   Cell::Type::red},
+            {Cell::Type::blue,  Cell::Type::empty, Cell::Type::empty, Cell::Type::empty},
     };
     const std::list<String *> inputLines = {
             new String("---"),
@@ -58,15 +55,65 @@ TEST_F(BoardParserTest, boardCreationSetsProperCellTypes) {
     }
 
     std::unique_ptr<Board> board(boardParser->generateBoard());
-    ASSERT_EQ(4, board->getSize());
-    for (size_t rowNum = 0u; rowNum < expectedTypes.size(); ++rowNum) {
-        const auto &row = expectedTypes[rowNum];
-        for (size_t cellNum = 0u; cellNum < row.size(); ++cellNum) {
-            ASSERT_EQ(row[cellNum], board->getCell(rowNum, cellNum)->getType());
-        }
-    }
 
+    ASSERT_EQ(4, board->size());
     ASSERT_EQ(4, board->getColorCount(Cell::Type::blue));
     ASSERT_EQ(5, board->getColorCount(Cell::Type::red));
     ASSERT_EQ(7, board->getColorCount(Cell::Type::empty));
+
+    for (size_t row = 0u; row < expectedTypes.size(); ++row) {
+        for (size_t num = 0u; num < expectedTypes[row].size(); ++num) {
+            ASSERT_EQ(expectedTypes[row][num], board->getType(row, num))
+                                        << "Wrong type at position (" << row << ", " << num << ")";
+        }
+    }
+}
+
+TEST_F(BoardParserTest, boardSize7Parse) {
+    const std::vector<std::vector<Cell::Type>> expectedTypes = {
+            {Cell::Type::empty, Cell::Type::red,   Cell::Type::empty, Cell::Type::red,   Cell::Type::empty, Cell::Type::red,   Cell::Type::blue},
+            {Cell::Type::blue,  Cell::Type::empty, Cell::Type::empty, Cell::Type::empty, Cell::Type::red,   Cell::Type::red,   Cell::Type::empty},
+            {Cell::Type::empty, Cell::Type::blue,  Cell::Type::empty, Cell::Type::red,   Cell::Type::empty, Cell::Type::red,   Cell::Type::red},
+            {Cell::Type::empty, Cell::Type::red,   Cell::Type::blue,  Cell::Type::red,   Cell::Type::empty, Cell::Type::empty, Cell::Type::empty},
+            {Cell::Type::empty, Cell::Type::empty, Cell::Type::empty, Cell::Type::empty, Cell::Type::blue,  Cell::Type::red,   Cell::Type::empty},
+            {Cell::Type::blue,  Cell::Type::empty, Cell::Type::blue,  Cell::Type::red,   Cell::Type::empty, Cell::Type::empty, Cell::Type::empty},
+            {Cell::Type::empty, Cell::Type::empty, Cell::Type::empty, Cell::Type::blue,  Cell::Type::red,   Cell::Type::blue,  Cell::Type::empty},
+    };
+    const std::list<String *> inputLines = {
+            new String("---"),
+            new String("--<   >--"),
+            new String("--< b >-< r >--"),
+            new String("--<   >-<   >-<   >--"),
+            new String("--<   >-< b >-<   >-< r >--"),
+            new String("--<   >-< r >-<   >-<   >-<   >--"),
+            new String("--< b >-<   >-< b >-< r >-< r >-< r >--"),
+            new String("<   >-<   >-<   >-< r >-<   >-< r >-< b >"),
+            new String("--<   >-< b >-<   >-<   >-< r >-<   >--"),
+            new String("--<   >-< r >-< b >-<   >-< r >--"),
+            new String("--< b >-<   >-< r >-<   >--"),
+            new String("--< r >-<   >-<   >--"),
+            new String("--< b >-<   >--"),
+            new String("--<   >--"),
+            new String("---")
+    };
+    Sequence s1;
+    for (auto *s: inputLines) {
+        EXPECT_CALL(*inputReaderMock, getLine())
+                .InSequence(s1)
+                .WillOnce(Return(s));
+    }
+
+    std::unique_ptr<Board> board(boardParser->generateBoard());
+
+    ASSERT_EQ(7, board->size());
+    ASSERT_EQ(9, board->getColorCount(Cell::Type::blue));
+    ASSERT_EQ(13, board->getColorCount(Cell::Type::red));
+    ASSERT_EQ(27, board->getColorCount(Cell::Type::empty));
+
+    for (size_t row = 0u; row < expectedTypes.size(); ++row) {
+        for (size_t num = 0u; num < expectedTypes[row].size(); ++num) {
+            ASSERT_EQ(expectedTypes[row][num], board->getType(row, num))
+                                        << "Wrong type at position (" << row << ", " << num << ")";
+        }
+    }
 }
