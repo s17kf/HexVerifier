@@ -15,6 +15,7 @@ namespace board {
 
     class Board {
     public:
+        typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
         typedef data_structures::Vector<Cell *> RowType;
         typedef Cell::Type CellType;
 
@@ -32,9 +33,15 @@ namespace board {
 
         [[nodiscard]] bool isBoardCorrect() const;
 
-        [[nodiscard]] bool isGameWon(Cell::Type color) const;
+        [[nodiscard]] bool isGameWonByRed() const;
+
+        [[nodiscard]] bool isGameWonByBlue() const;
 
         bool isBoardPossible() const;
+
+        bool canRedWinInNMovesWithNaive(size_t n);
+
+        bool canBlueWinInNMovesWithNaive(size_t n);
 
         [[nodiscard]] inline Cell::Type getType(size_t row, size_t num) const {
             return mBoard[row][num].getType();
@@ -42,13 +49,21 @@ namespace board {
 
         void setType(size_t row, size_t num, CellType type);
 
-
     private:
         inline void incColorCount(Cell::Type color);
 
         inline void decColorCount(Cell::Type color);
 
-        [[nodiscard]] inline bool isGameWon(Cell::Type color, List<CellCoords> &path) const;
+        [[nodiscard]] inline bool isGameWonByRed(List<CellCoords> &path) const;
+
+        [[nodiscard]] inline bool isGameWonByBlue(List<CellCoords> &path) const;
+
+        [[nodiscard]] inline bool canWinInNMovesWithNaive(size_t n, DistancesType &distancesToFirstBorder,
+                                                          DistancesType &distancesToSecondBorder);
+
+        inline void initDistances(DistancesType &distances) const;
+
+        inline void fillEmptyCells(data_structures::List<CellCoords *> &cellList);
 
         size_t mSize;
         size_t mRedCellsCount;

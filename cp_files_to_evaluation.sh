@@ -17,6 +17,7 @@ files_to_cp=(
 "board/include/DoneVerifiers.h"
 "board/include/NeighboursHelpers.h"
 #"board/include/WinVerifiers.h"
+"board/algorithms/include/Bfs.h"
 "board/algorithms/include/Dfs.h"
 "board/src/Board.cpp"
 "board/src/BoardParser.cpp"
@@ -24,6 +25,7 @@ files_to_cp=(
 "board/src/DoneVerifiers.cpp"
 "board/src/HexVerifier.cpp"
 "board/src/NeighboursHelpers.cpp"
+"board/algorithms/src/Bfs.cpp"
 "board/algorithms/src/Dfs.cpp"
 
 "utils/include/InputReader.h"

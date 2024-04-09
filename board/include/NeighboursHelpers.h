@@ -15,7 +15,6 @@ using data_structures::Vector;
 namespace board {
     class Board;
 
-
     class NeighboursHelper {
     public:
         typedef Vector <Vector<bool>> VisitedType;
@@ -73,20 +72,21 @@ namespace board {
                   const VisitedType *visited, bool emptyAllowed) const override;
     };
 
-
     class DistanceUpdater {
     public:
         typedef Vector <Vector<size_t>> DistancesType;
 
-        DistanceUpdater(const Board &board, DistancesType &distances) : mBoard(board),
-                                                                              mDistances(distances) {}
+        DistanceUpdater(const Board &board, DistancesType &distances, Cell::Type color) :
+                mBoard(board), mDistances(distances), mColor(color) {}
 
-        inline void updateDistance(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
-        inline bool shouldVisit(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
+        void updateDistance(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
+
+        bool shouldVisit(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
 
     private:
         const Board &mBoard;
         DistancesType &mDistances;
+        Cell::Type mColor;
     };
 
     class EmptyNeighbourHelper : public NeighboursHelper {
@@ -96,16 +96,17 @@ namespace board {
         explicit EmptyNeighbourHelper(const Board &board, Cell::Type color, DistancesType &distances) :
                 NeighboursHelper(board),
                 mColor(color),
-                mDistanceUpdater(board, distances) {}
+                mDistanceUpdater(board, distances, color) {}
 
         void fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords, const VisitedType *visited,
                   bool emptyAllowed = true) const override;
 
 
     protected:
-        inline void addToListIfNotVisited(size_t row, size_t num, CellCoords::Direction direction, size_t parentRow,
-                                          size_t parentNum, List<CellCoords *> &list, const VisitedType *visited,
-                                          Cell::Type color, bool emptyAllowed) const override;
+        void addToListIfNotVisited(size_t row, size_t num, CellCoords::Direction direction, size_t parentRow,
+                                   size_t parentNum, List<CellCoords *> &list, const VisitedType *visited,
+                                   Cell::Type color, bool emptyAllowed) const override;
+
 
     private:
         Cell::Type mColor;

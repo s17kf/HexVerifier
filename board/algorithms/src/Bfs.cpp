@@ -12,6 +12,11 @@ namespace board::algorithms {
                                          Bfs::DistancesType &distancesToRightBorder,
                                          Bfs::DistancesType &distancesToTopBorder,
                                          Bfs::DistancesType &distancesToBottomBorder) {
+
+        initDistances(distancesToLeftBorder);
+        initDistances(distancesToRightBorder);
+        initDistances(distancesToTopBorder);
+        initDistances(distancesToBottomBorder);
         {
             List<CellCoords *> nexts;
             fillNextsAndUpdateDistancesInColumn(nexts, distancesToLeftBorder, 0, Cell::Type::red);
@@ -38,8 +43,7 @@ namespace board::algorithms {
         }
     }
 
-    void Bfs::fillDistancesToOneBorder(List<CellCoords *> &nexts,
-                                       EmptyNeighbourHelper &neighbourHelper) {
+    void Bfs::fillDistancesToOneBorder(List<CellCoords *> &nexts, EmptyNeighbourHelper &neighbourHelper) {
         VisitedType visited(mBoard.size());
         for (auto &row: visited) {
             row.init(mBoard.size());

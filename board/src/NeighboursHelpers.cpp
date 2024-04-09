@@ -127,28 +127,26 @@ namespace board {
 
     void EmptyNeighbourHelper::addToListIfNotVisited(
             size_t row, size_t num, CellCoords::Direction direction, size_t parentRow, size_t parentNum,
-            List<CellCoords *> &list, const NeighboursHelper::VisitedType *visited, Cell::Type color,
+            List<CellCoords *> &list, const VisitedType *visited, Cell::Type color,
             bool emptyAllowed) const {
         if (mDistanceUpdater.shouldVisit(row, num, parentRow, parentNum)) {
-            if (mBoard.getType(row, num) == Cell::Type::empty ||
-                (mBoard.getType(parentRow, parentNum) == color && mBoard.getType(row, num) == color)) {
-                list.pushBack(new CellCoords{row, num, direction});
-                mDistanceUpdater.updateDistance(row, num, parentRow, parentNum);
-            }
+            list.pushBack(new CellCoords{row, num, direction});
+            mDistanceUpdater.updateDistance(row, num, parentRow, parentNum);
         }
     }
 
     void DistanceUpdater::updateDistance(size_t row, size_t num, size_t parentRow, size_t parentNum) const {
-        if (mBoard.getType(row, num) != Cell::Type::empty) {
-            mDistances[row][num] = 0;
-            return;
-        }
-        size_t distance = mDistances[parentRow][parentNum] + 1;
+        size_t distance = mBoard.getType(row, num) == Cell::Type::empty ? mDistances[parentRow][parentNum] + 1
+                                                                        : mDistances[parentRow][parentNum];
         if (distance < mDistances[row][num])
             mDistances[row][num] = distance;
     }
 
     bool DistanceUpdater::shouldVisit(size_t row, size_t num, size_t parentRow, size_t parentNum) const {
-        return mDistances[parentRow][parentNum] + 1 < mDistances[row][num];
+        if (mBoard.getType(row, num) == Cell::Type::empty)
+            return mDistances[parentRow][parentNum] + 1 < mDistances[row][num];
+        if (mBoard.getType(row, num) == mColor)
+            return mDistances[parentRow][parentNum] < mDistances[row][num];
+        return false;
     }
 }

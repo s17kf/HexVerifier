@@ -7,6 +7,7 @@
 #include "DoneVerifiers.h"
 #include "NeighboursHelpers.h"
 #include "Dfs.h"
+#include "Bfs.h"
 
 
 using data_structures::Vector;
@@ -14,6 +15,7 @@ using data_structures::List;
 
 namespace board {
     using algorithms::Dfs;
+    using algorithms::Bfs;
 
     Board::Board(size_t size) : mSize(size),
                                 mRedCellsCount(0),
@@ -51,52 +53,141 @@ namespace board {
         return true;
     }
 
-    bool Board::isGameWon(Cell::Type color) const {
+    bool Board::isGameWonByRed() const {
         List<CellCoords> path;
-        return isGameWon(color, path);
+        return isGameWonByRed(path);
     }
 
-    bool Board::isGameWon(Cell::Type color, List<CellCoords> &path) const {switch (color) {
-            case Cell::Type::red: {
-                Dfs dfs(*this, mRedNeighboursHelper, mRedDoneVerifier);
-                List<CellCoords *> startCoordsList;
-                for (size_t row = 0u; row < size(); ++row) {
-                    if (getType(row, 0) == Cell::Type::red)
-                        startCoordsList.pushBack(new CellCoords{row, 0, CellCoords::Direction::right});
-                }
-                return dfs(startCoordsList, path);
-            }
-            case Cell::Type::blue: {
-                Dfs dfs(*this, mBlueNeighboursHelper, mBlueDoneVerifier);
-                List<CellCoords *> startCoordsList;
-                for (size_t num = 0u; num < size(); ++num) {
-                    if (getType(0, num) == Cell::Type::blue)
-                        startCoordsList.pushBack(new CellCoords{0, num, CellCoords::Direction::left});
-                }
-                return dfs(startCoordsList, path);
-            }
-            default:
-                throw std::invalid_argument("Only blue and red colors are allowed for win verification");
+    bool Board::isGameWonByBlue() const {
+        List<CellCoords> path;
+        return isGameWonByBlue(path);
+    }
+
+    bool Board::isGameWonByRed(List<CellCoords> &path) const {
+        Dfs dfs(*this, mRedNeighboursHelper, mRedDoneVerifier);
+        List<CellCoords *> startCoordsList;
+        for (size_t row = 0u; row < size(); ++row) {
+            if (getType(row, 0) == Cell::Type::red)
+                startCoordsList.pushBack(new CellCoords{row, 0, CellCoords::Direction::right});
         }
+        return dfs(startCoordsList, path);
+    }
+
+    bool Board::isGameWonByBlue(List<CellCoords> &path) const {
+        Dfs dfs(*this, mBlueNeighboursHelper, mBlueDoneVerifier);
+        List<CellCoords *> startCoordsList;
+        for (size_t num = 0u; num < size(); ++num) {
+            if (getType(0, num) == Cell::Type::blue)
+                startCoordsList.pushBack(new CellCoords{0, num, CellCoords::Direction::left});
+        }
+        return dfs(startCoordsList, path);
     }
 
     bool Board::isBoardPossible() const {
         if (!isBoardCorrect())
             return false;
         List<CellCoords> redPath;
-        if(isGameWon(Cell::Type::red, redPath)){
+        if (isGameWonByRed(redPath)) {
             if (mBlueCellsCount == mRedCellsCount)
                 return false;
-            return !isGameWon(Cell::Type::red, redPath);
+            return !isGameWonByRed(redPath);
         }
         List<CellCoords> bluePath;
-        if(isGameWon(Cell::Type::blue, bluePath)){
+        if (isGameWonByBlue(bluePath)) {
             if (mBlueCellsCount < mRedCellsCount)
                 return false;
-            return !isGameWon(Cell::Type::blue, bluePath);
+            return !isGameWonByBlue(bluePath);
         }
-
         return true;
+    }
+
+    bool Board::canRedWinInNMovesWithNaive(size_t n) {
+        bool movesFirst = mRedCellsCount == mBlueCellsCount;
+        size_t neededEmptyCells = movesFirst ? 2 * n - 1 : 2 * n;
+        if (neededEmptyCells > getColorCount(Cell::Type::empty))
+            return false;
+        if (!isBoardCorrect() || isGameWonByRed() || isGameWonByBlue())
+            return false;
+        DistancesType distancesToLeftBorder(size());
+        DistancesType distancesToRightBorder(size());
+        DistancesType distancesToTopBorder(size());
+        DistancesType distancesToBottomBorder(size());
+        Bfs bfs(*this);
+        bfs.fillDistancesForEmptyCells(distancesToLeftBorder, distancesToRightBorder, distancesToTopBorder,
+                                       distancesToBottomBorder);
+        return canWinInNMovesWithNaive(n, distancesToLeftBorder, distancesToRightBorder);
+    }
+
+    bool Board::canBlueWinInNMovesWithNaive(size_t n) {
+        bool movesFirst = mRedCellsCount > mBlueCellsCount;
+        size_t neededEmptyCells = movesFirst ? 2 * n - 1 : 2 * n;
+        if (neededEmptyCells > getColorCount(Cell::Type::empty))
+            return false;
+        if (!isBoardCorrect() || isGameWonByRed() || isGameWonByBlue())
+            return false;
+        DistancesType distancesToLeftBorder(size());
+        DistancesType distancesToRightBorder(size());
+        DistancesType distancesToTopBorder(size());
+        DistancesType distancesToBottomBorder(size());
+        Bfs bfs(*this);
+        bfs.fillDistancesForEmptyCells(distancesToLeftBorder, distancesToRightBorder, distancesToTopBorder,
+                                       distancesToBottomBorder);
+
+        return canWinInNMovesWithNaive(n, distancesToTopBorder, distancesToBottomBorder);
+    }
+
+    bool Board::canWinInNMovesWithNaive(size_t n, Board::DistancesType &distancesToFirstBorder,
+                                        Board::DistancesType &distancesToSecondBorder) {
+        List<CellCoords *> emptyCells;
+        fillEmptyCells(emptyCells);
+        if (n == 1) {
+            bool winningCellExist = false;
+            while (!emptyCells.empty()) {
+                auto *coords = emptyCells.popFront();
+                auto &row = coords->row;
+                auto &num = coords->num;
+                if (distancesToFirstBorder[row][num] > 1 || distancesToSecondBorder[row][num] > 1) {
+                    delete coords;
+                    continue;
+                }
+                winningCellExist = true;
+                delete coords;
+                break;
+            }
+            while (!emptyCells.empty()) {
+                delete emptyCells.popFront();
+            }
+            return winningCellExist;
+        }
+        bool twoMoveWinningCellExist = false;
+        bool oneMoveWiningCellExist = false;
+        bool idleMoveCellToFirstBorderExist = false;
+        bool idleMoveCellToSecondBorderExist = false;
+        while (!emptyCells.empty()) {
+            auto *coords = emptyCells.popFront();
+            auto &row = coords->row;
+            auto &num = coords->num;
+            if (distancesToFirstBorder[row][num] == 1 && distancesToSecondBorder[row][num] == 2) {
+                twoMoveWinningCellExist = true;
+                delete coords;
+                break;
+            }
+            if (distancesToFirstBorder[row][num] == 1 && distancesToSecondBorder[row][num] == 1) {
+                oneMoveWiningCellExist = true;
+            }
+            if (distancesToFirstBorder[row][num] > 1) {
+                idleMoveCellToFirstBorderExist = true;
+            }
+            if (distancesToSecondBorder[row][num] > 1) {
+                idleMoveCellToSecondBorderExist = true;
+            }
+            delete coords;
+        }
+        while (!emptyCells.empty()) {
+            delete emptyCells.popFront();
+        }
+        return twoMoveWinningCellExist ||
+               (oneMoveWiningCellExist && (idleMoveCellToFirstBorderExist || idleMoveCellToSecondBorderExist));
     }
 
     void Board::setType(size_t row, size_t num, CellType type) {
@@ -132,6 +223,16 @@ namespace board {
                 return;
             default:
                 throw std::invalid_argument("Try to decrement count of not allowed type of cell!");
+        }
+    }
+
+    void Board::fillEmptyCells(List<CellCoords *> &cellList) {
+        for (size_t row = 0u; row < size(); ++row) {
+            for (size_t num = 0u; num < size(); ++num) {
+                if (mBoard[row][num].getType() == Cell::Type::empty) {
+                    cellList.pushBack(new CellCoords{row, num});
+                }
+            }
         }
     }
 
