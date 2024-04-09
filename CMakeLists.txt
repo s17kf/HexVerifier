@@ -37,6 +37,9 @@ set(BOARD_TEST_SOURCES
         board/src/Cell.cpp
         board/src/Board.cpp
         board/src/BoardParser.cpp
+        board/src/DoneVerifiers.cpp
+        board/src/NeighboursHelpers.cpp
+        board/algorithms/src/Dfs.cpp
         board/tests/BoardTest.cpp
         board/tests/BoardParserTest.cpp
 )

@@ -48,14 +48,14 @@ namespace board {
             printf("NO\n");
             return;
         }
-//        if (*query == "IS_BOARD_POSSIBLE") {
-//            if (board->isBoardPossible()) {
-//                printf("YES\n");
-//            } else {
-//                printf("NO\n");
-//            }
-//            return;
-//        }
+        if (*query == "IS_BOARD_POSSIBLE") {
+            if (board->isBoardPossible()) {
+                printf("YES\n");
+            } else {
+                printf("NO\n");
+            }
+            return;
+        }
 //        auto splittedQuery = query->split('_');
 //        auto wordIt = splittedQuery.begin();
 //        if(*(wordIt++) != "CAN") {

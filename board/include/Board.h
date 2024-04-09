@@ -32,6 +32,8 @@ namespace board {
 
         [[nodiscard]] bool isGameWon(Cell::Type color) const;
 
+        bool isBoardPossible() const;
+
         [[nodiscard]] inline Cell::Type getType(size_t row, size_t num) const {
             return mBoard[row][num].getType();
         }
@@ -43,6 +45,8 @@ namespace board {
         inline void incColorCount(Cell::Type color);
 
         inline void decColorCount(Cell::Type color);
+
+        [[nodiscard]] inline bool isGameWon(Cell::Type color, List<CellCoords> &path) const;
 
         size_t mSize;
         size_t mRedCellsCount;

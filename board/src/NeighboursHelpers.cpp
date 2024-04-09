@@ -18,7 +18,7 @@ namespace board {
                                    const Vector<Vector<bool>> &visited, bool emptyAllowed) const {
         auto row = cellCoords->row;
         auto num = cellCoords->num;
-        if (cellCoords->direction != CellCoords::Direction::left ||
+        if (cellCoords->direction != CellCoords::Direction::left &&
             cellCoords->direction != CellCoords::Direction::down) {
             addNeighbourAboveLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
         }
@@ -37,15 +37,15 @@ namespace board {
                                     const Vector<Vector<bool>> &visited, bool emptyAllowed) const {
         auto row = cellCoords->row;
         auto num = cellCoords->num;
-        if (cellCoords->direction != CellCoords::Direction::up ||
+        if (cellCoords->direction != CellCoords::Direction::up &&
             cellCoords->direction != CellCoords::Direction::right) {
             addNeighbourAboveLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
         }
-        addNeighbourAbove(row, num, CellType::blue, neighbours, visited, emptyAllowed);
-        addNeighbourRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourBelowRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourBelow(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
         addNeighbourLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourBelow(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourBelowRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourAbove(row, num, CellType::blue, neighbours, visited, emptyAllowed);
         if (cellCoords->direction == CellCoords::Direction::up ||
             cellCoords->direction == CellCoords::Direction::right) {
             addNeighbourAboveLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);

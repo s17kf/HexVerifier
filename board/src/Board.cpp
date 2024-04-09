@@ -52,7 +52,11 @@ namespace board {
     }
 
     bool Board::isGameWon(Cell::Type color) const {
-        switch (color) {
+        List<CellCoords> path;
+        return isGameWon(color, path);
+    }
+
+    bool Board::isGameWon(Cell::Type color, List<CellCoords> &path) const {switch (color) {
             case Cell::Type::red: {
                 Dfs dfs(*this, mRedNeighboursHelper, mRedDoneVerifier);
                 List<CellCoords *> startCoordsList;
@@ -60,7 +64,7 @@ namespace board {
                     if (getType(row, 0) == Cell::Type::red)
                         startCoordsList.pushBack(new CellCoords{row, 0, CellCoords::Direction::right});
                 }
-                return dfs(startCoordsList);
+                return dfs(startCoordsList, path);
             }
             case Cell::Type::blue: {
                 Dfs dfs(*this, mBlueNeighboursHelper, mBlueDoneVerifier);
@@ -69,11 +73,30 @@ namespace board {
                     if (getType(0, num) == Cell::Type::blue)
                         startCoordsList.pushBack(new CellCoords{0, num, CellCoords::Direction::left});
                 }
-                return dfs(startCoordsList);
+                return dfs(startCoordsList, path);
             }
             default:
                 throw std::invalid_argument("Only blue and red colors are allowed for win verification");
         }
+    }
+
+    bool Board::isBoardPossible() const {
+        if (!isBoardCorrect())
+            return false;
+        List<CellCoords> redPath;
+        if(isGameWon(Cell::Type::red, redPath)){
+            if (mBlueCellsCount == mRedCellsCount)
+                return false;
+            return !isGameWon(Cell::Type::red, redPath);
+        }
+        List<CellCoords> bluePath;
+        if(isGameWon(Cell::Type::blue, bluePath)){
+            if (mBlueCellsCount < mRedCellsCount)
+                return false;
+            return !isGameWon(Cell::Type::blue, bluePath);
+        }
+
+        return true;
     }
 
     void Board::setType(size_t row, size_t num, CellType type) {

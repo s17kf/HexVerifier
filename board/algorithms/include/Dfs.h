@@ -19,11 +19,11 @@ namespace board::algorithms {
         Dfs(const Board &mBoard, const NeighboursHelper &neighboursHelper, const DoneVerifier &doneVerifier)
                 : mBoard(mBoard), neighboursHelper(neighboursHelper), doneVerifier(doneVerifier) {}
 
-        bool operator()(const data_structures::List<CellCoords *> &startCoordsList) const;
+        bool operator()(const data_structures::List<CellCoords *> &startCoordsList, List<CellCoords> &path) const;
 
     private:
         bool handleNode(data_structures::Vector<data_structures::Vector<bool>> &visited,
-                        const CellCoords *coords) const;
+                        const CellCoords *coords, List<CellCoords> &path) const;
 
         const Board &mBoard;
         const NeighboursHelper &neighboursHelper;
