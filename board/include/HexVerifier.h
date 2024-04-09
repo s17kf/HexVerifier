@@ -8,6 +8,7 @@
 #include "InputReader.h"
 #include "String.h"
 #include "Board.h"
+#include "DistancesKeeper.h"
 
 namespace board {
 
@@ -16,7 +17,7 @@ namespace board {
         static void handleInput(utils::InputReader &inputReader);
     private:
         static void handleBoard(utils::InputReader &inputReader);
-        static void handleQuery(utils::String *query, Board *board);
+        static void handleQuery(utils::String *query, Board *board, const DistancesKeeper &distancesKeeper);
     };
 
 } // board

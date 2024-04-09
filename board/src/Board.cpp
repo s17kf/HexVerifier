@@ -101,43 +101,25 @@ namespace board {
         return true;
     }
 
-    bool Board::canRedWinInNMovesWithNaive(size_t n) {
+    bool Board::canRedWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper) {
         bool movesFirst = mRedCellsCount == mBlueCellsCount;
-        size_t neededEmptyCells = movesFirst ? 2 * n - 1 : 2 * n;
-        if (neededEmptyCells > getColorCount(Cell::Type::empty))
-            return false;
-        if (!isBoardCorrect() || isGameWonByRed() || isGameWonByBlue())
-            return false;
-        DistancesType distancesToLeftBorder(size());
-        DistancesType distancesToRightBorder(size());
-        DistancesType distancesToTopBorder(size());
-        DistancesType distancesToBottomBorder(size());
-        Bfs bfs(*this);
-        bfs.fillDistancesForEmptyCells(distancesToLeftBorder, distancesToRightBorder, distancesToTopBorder,
-                                       distancesToBottomBorder);
-        return canWinInNMovesWithNaive(n, distancesToLeftBorder, distancesToRightBorder);
+        return canWinInNMovesWithNaive(n, movesFirst, distancesKeeper.getDistancesToLeftBorder(),
+                                       distancesKeeper.getDistancesToRightBorder());
     }
 
-    bool Board::canBlueWinInNMovesWithNaive(size_t n) {
+    bool Board::canBlueWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper) {
         bool movesFirst = mRedCellsCount > mBlueCellsCount;
+        return canWinInNMovesWithNaive(n, movesFirst, distancesKeeper.getDistancesToTopBorder(),
+                                       distancesKeeper.getDistancesToBottomBorder());
+    }
+
+    bool Board::canWinInNMovesWithNaive(size_t n, bool movesFirst, const Board::DistancesType &distancesToFirstBorder,
+                                        const Board::DistancesType &distancesToSecondBorder) {
         size_t neededEmptyCells = movesFirst ? 2 * n - 1 : 2 * n;
         if (neededEmptyCells > getColorCount(Cell::Type::empty))
             return false;
         if (!isBoardCorrect() || isGameWonByRed() || isGameWonByBlue())
             return false;
-        DistancesType distancesToLeftBorder(size());
-        DistancesType distancesToRightBorder(size());
-        DistancesType distancesToTopBorder(size());
-        DistancesType distancesToBottomBorder(size());
-        Bfs bfs(*this);
-        bfs.fillDistancesForEmptyCells(distancesToLeftBorder, distancesToRightBorder, distancesToTopBorder,
-                                       distancesToBottomBorder);
-
-        return canWinInNMovesWithNaive(n, distancesToTopBorder, distancesToBottomBorder);
-    }
-
-    bool Board::canWinInNMovesWithNaive(size_t n, Board::DistancesType &distancesToFirstBorder,
-                                        Board::DistancesType &distancesToSecondBorder) {
         List<CellCoords *> emptyCells;
         fillEmptyCells(emptyCells);
         if (n == 1) {

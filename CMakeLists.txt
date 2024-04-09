@@ -15,6 +15,7 @@ include_directories(
 set(MAIN_SOURCES
         board/src/Board.cpp
         board/src/BoardParser.cpp
+        board/src/DistancesKeeper.cpp
         board/src/DoneVerifiers.cpp
         board/src/HexVerifier.cpp
         board/src/NeighboursHelpers.cpp
@@ -38,6 +39,7 @@ set(BOARD_TEST_SOURCES
         board/src/Cell.cpp
         board/src/Board.cpp
         board/src/BoardParser.cpp
+        board/src/DistancesKeeper.cpp
         board/src/DoneVerifiers.cpp
         board/src/NeighboursHelpers.cpp
         board/tests/BoardTest.cpp

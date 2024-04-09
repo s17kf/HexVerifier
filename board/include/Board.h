@@ -9,6 +9,7 @@
 #include "Vector.h"
 #include "DoneVerifiers.h"
 #include "NeighboursHelpers.h"
+#include "DistancesKeeper.h"
 
 
 namespace board {
@@ -39,9 +40,9 @@ namespace board {
 
         bool isBoardPossible() const;
 
-        bool canRedWinInNMovesWithNaive(size_t n);
+        bool canRedWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper);
 
-        bool canBlueWinInNMovesWithNaive(size_t n);
+        bool canBlueWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper);
 
         [[nodiscard]] inline Cell::Type getType(size_t row, size_t num) const {
             return mBoard[row][num].getType();
@@ -58,10 +59,9 @@ namespace board {
 
         [[nodiscard]] inline bool isGameWonByBlue(List<CellCoords> &path) const;
 
-        [[nodiscard]] inline bool canWinInNMovesWithNaive(size_t n, DistancesType &distancesToFirstBorder,
-                                                          DistancesType &distancesToSecondBorder);
-
-        inline void initDistances(DistancesType &distances) const;
+        [[nodiscard]] inline bool canWinInNMovesWithNaive(
+                size_t n, bool movesFirst, const DistancesType &distancesToFirstBorder,
+                const DistancesType &distancesToSecondBorder);
 
         inline void fillEmptyCells(data_structures::List<CellCoords *> &cellList);
 

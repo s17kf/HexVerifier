@@ -14,7 +14,7 @@ using utils::String;
 
 namespace board {
 
-    void HexVerifier::handleQuery(utils::String *query, Board *board) {
+    void HexVerifier::handleQuery(utils::String *query, Board *board, const DistancesKeeper &distancesKeeper) {
         if (*query == "BOARD_SIZE") {
             printf("%lu\n", board->size());
             return;
@@ -73,7 +73,7 @@ namespace board {
         String &opponentType = *wordIt;
         if(opponentType == "NAIVE") {
             if(color == "RED"){
-                if (board->canRedWinInNMovesWithNaive(moves))
+                if (board->canRedWinInNMovesWithNaive(moves, distancesKeeper))
                     printf("YES\n");
                 else
                     printf("NO\n");
@@ -81,7 +81,7 @@ namespace board {
             }
 
             if(color == "BLUE"){
-                if (board->canBlueWinInNMovesWithNaive(moves))
+                if (board->canBlueWinInNMovesWithNaive(moves, distancesKeeper))
                     printf("YES\n");
                 else
                     printf("NO\n");
@@ -97,6 +97,7 @@ namespace board {
         Board *board = boardParser.generateBoard();
         if (board == nullptr)
             return;
+        const DistancesKeeper distancesKeeper(*board);
 
         String *lastLine = inputReader.getLine();
         while (!inputReader.eof() && *lastLine != boardParser.BOARD_DELIMITER) {
@@ -105,7 +106,7 @@ namespace board {
                 lastLine = inputReader.getLine();
                 continue;
             }
-            handleQuery(lastLine, board);
+            handleQuery(lastLine, board, distancesKeeper);
             printf("\n");
             delete lastLine;
             lastLine = inputReader.getLine();
