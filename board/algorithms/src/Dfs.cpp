@@ -40,7 +40,7 @@ namespace board::algorithms {
             return true;
         }
         List<CellCoords *> nextCoordsList;
-        neighboursHelper.fill(nextCoordsList, coords, visited, false);
+        neighboursHelper.fill(nextCoordsList, coords, &visited, false);
         bool result = false;
         for (const auto *nextCoords: nextCoordsList) {
             if (handleNode(visited, nextCoords, path)) {

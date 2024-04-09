@@ -19,6 +19,7 @@ set(MAIN_SOURCES
         board/src/HexVerifier.cpp
         board/src/NeighboursHelpers.cpp
         board/algorithms/src/Dfs.cpp
+        board/algorithms/src/Bfs.cpp
         utils/src/String.cpp
         utils/src/InputReaderImpl.cpp
 )
@@ -39,9 +40,11 @@ set(BOARD_TEST_SOURCES
         board/src/BoardParser.cpp
         board/src/DoneVerifiers.cpp
         board/src/NeighboursHelpers.cpp
-        board/algorithms/src/Dfs.cpp
         board/tests/BoardTest.cpp
         board/tests/BoardParserTest.cpp
+        board/algorithms/src/Dfs.cpp
+        board/algorithms/src/Bfs.cpp
+        board/algorithms/tests/BfsTest.cpp
 )
 
 set(DATA_STRUCTURES_TEST_SOURCES

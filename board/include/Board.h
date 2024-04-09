@@ -22,6 +22,8 @@ namespace board {
 
         explicit Board(size_t size);
 
+        Board(const Board &) = delete;
+
         inline size_t size() const {
             return mSize;
         }
