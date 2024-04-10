@@ -16,6 +16,7 @@ using data_structures::List;
 namespace board {
     using algorithms::Dfs;
     using algorithms::Bfs;
+    using algorithms::WinVerificationAlgorithm;
 
     Board::Board(size_t size) : mSize(size),
                                 mRedCellsCount(0),
@@ -24,7 +25,9 @@ namespace board {
                                 mRedDoneVerifier(*this),
                                 mBlueDoneVerifier(*this),
                                 mRedNeighboursHelper(*this),
-                                mBlueNeighboursHelper(*this) {
+                                mBlueNeighboursHelper(*this),
+                                mRedStraightNeighboursHelper(*this),
+                                mBlueStraightNeighboursHelper(*this) {
         for (auto &row: mBoard) {
             row.init(size);
         }
@@ -77,40 +80,46 @@ namespace board {
         return false;
     }
 
-    bool Board::isGameWonByRed(List<CellCoords> &path) const {
-        Dfs dfs(*this, mRedNeighboursHelper, mRedDoneVerifier);
+    bool Board::isGameWonByRed(const WinVerificationAlgorithm &algorithm, List<CellCoords> &path) const {
         List<CellCoords *> startCoordsList;
         for (size_t row = 0u; row < size(); ++row) {
             if (getType(row, 0) == Cell::Type::red)
                 startCoordsList.pushBack(new CellCoords{row, 0, CellCoords::Direction::right});
         }
-        return dfs(startCoordsList, path);
+        return algorithm(startCoordsList, path);
     }
 
-    bool Board::isGameWonByBlue(List<CellCoords> &path) const {
-        Dfs dfs(*this, mBlueNeighboursHelper, mBlueDoneVerifier);
+    bool Board::isGameWonByBlue(const WinVerificationAlgorithm &algorithm, List<CellCoords> &path) const {
         List<CellCoords *> startCoordsList;
         for (size_t num = 0u; num < size(); ++num) {
             if (getType(0, num) == Cell::Type::blue)
                 startCoordsList.pushBack(new CellCoords{0, num, CellCoords::Direction::left});
         }
-        return dfs(startCoordsList, path);
+        return algorithm(startCoordsList, path);
     }
 
     bool Board::isBoardPossible() const {
         if (!isBoardCorrect())
             return false;
-        List<CellCoords> redPath;
-        if (isGameWonByRed(redPath)) {
-            if (mBlueCellsCount == mRedCellsCount)
-                return false;
-            return !isGameWonByRed(redPath);
+        {
+            List<CellCoords> redPath;
+            const Dfs dfs(*this, mRedNeighboursHelper, mRedDoneVerifier);
+            if (isGameWonByRed(dfs, redPath)) {
+                if (mBlueCellsCount == mRedCellsCount)
+                    return false;
+                const Bfs bfs(*this, mRedStraightNeighboursHelper, mRedDoneVerifier);
+                return !isGameWonByRed(bfs, redPath);
+            }
         }
-        List<CellCoords> bluePath;
-        if (isGameWonByBlue(bluePath)) {
-            if (mBlueCellsCount < mRedCellsCount)
-                return false;
-            return !isGameWonByBlue(bluePath);
+        {
+            List<CellCoords> bluePath;
+            const Dfs dfs(*this, mBlueNeighboursHelper, mBlueDoneVerifier);
+            if (isGameWonByBlue(dfs, bluePath)) {
+                if (mBlueCellsCount < mRedCellsCount)
+                    return false;
+                const Bfs bfs(*this, mBlueStraightNeighboursHelper, mBlueDoneVerifier);
+                return !isGameWonByBlue(bfs, bluePath);
+            }
         }
         return true;
     }

@@ -5,6 +5,7 @@
 #ifndef HEX_DFS_H
 #define HEX_DFS_H
 
+#include "WinVerificationAlgorithm.h"
 #include "Board.h"
 #include "NeighboursHelpers.h"
 #include "DoneVerifiers.h"
@@ -14,14 +15,14 @@
 
 namespace board::algorithms {
 
-    class Dfs {
+    class Dfs : public WinVerificationAlgorithm {
     public:
         typedef NeighboursHelper::VisitedType VisitedType;
 
         Dfs(const Board &mBoard, const NeighboursHelper &neighboursHelper, const DoneVerifier &doneVerifier)
                 : mBoard(mBoard), neighboursHelper(neighboursHelper), doneVerifier(doneVerifier) {}
 
-        bool operator()(const data_structures::List<CellCoords *> &startCoordsList, List<CellCoords> &path) const;
+        bool operator()(data_structures::List<CellCoords *> &startCoordsList, List<CellCoords> &path) const override;
 
     private:
         bool handleNode(data_structures::Vector<data_structures::Vector<bool>> &visited,

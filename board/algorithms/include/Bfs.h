@@ -5,6 +5,7 @@
 #ifndef HEX_BFS_H
 #define HEX_BFS_H
 
+#include "WinVerificationAlgorithm.h"
 #include "Board.h"
 #include "DoneVerifiers.h"
 #include "List.h"
@@ -14,7 +15,7 @@
 
 namespace board::algorithms {
 
-    class Bfs {
+    class Bfs : public WinVerificationAlgorithm {
     public:
         typedef NeighboursHelper::VisitedType VisitedType;
         typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
@@ -22,7 +23,7 @@ namespace board::algorithms {
         Bfs(const Board &mBoard, const NeighboursHelper &mNeighboursHelper, const DoneVerifier &mDoneVerifier)
                 : mBoard(mBoard), mNeighboursHelper(mNeighboursHelper), mDoneVerifier(mDoneVerifier) {}
 
-        bool operator()(data_structures::List<CellCoords *> &nexts);
+        bool operator()(data_structures::List<CellCoords *> &nexts, List<CellCoords> &path) const override;
 
         static void fillDistancesForEmptyCells(const Board &board,
                                                DistancesType &distancesToLeftBorder,

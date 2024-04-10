@@ -204,9 +204,12 @@ TEST_F(BfsTest, bfsNoWinner) {
     BlueDoneVerifier blueDoneVerifier(board);
     List<CellCoords *> redNexts = getStartCoordsForRed(board);
     List<CellCoords *> blueNexts = getStartCoordsForBlue(board);
+    List<CellCoords> path;
 
-    ASSERT_FALSE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)(redNexts));
-    ASSERT_FALSE(Bfs(board, blueStraightNeighbourHelper, blueDoneVerifier)(blueNexts));
+    ASSERT_FALSE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)
+                         (redNexts, path));
+    ASSERT_FALSE(Bfs(board, blueStraightNeighbourHelper, blueDoneVerifier)
+                         (blueNexts, path));
 }
 
 TEST_F(BfsTest, bfsRedWin) {
@@ -244,9 +247,10 @@ TEST_F(BfsTest, bfsRedWin) {
     BlueDoneVerifier blueDoneVerifier(board);
     List<CellCoords *> redNexts = getStartCoordsForRed(board);
     List<CellCoords *> blueNexts = getStartCoordsForBlue(board);
+    List<CellCoords> path;
 
-    ASSERT_TRUE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)(redNexts));
-    ASSERT_FALSE(Bfs(board, blueStraightNeighbourHelper, blueDoneVerifier)(blueNexts));
+    ASSERT_TRUE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)(redNexts, path));
+    ASSERT_FALSE(Bfs(board, blueStraightNeighbourHelper, blueDoneVerifier)(blueNexts, path));
 }
 
 TEST_F(BfsTest, bfsBlueWin) {
@@ -284,7 +288,8 @@ TEST_F(BfsTest, bfsBlueWin) {
     BlueDoneVerifier blueDoneVerifier(board);
     List<CellCoords *> redNexts = getStartCoordsForRed(board);
     List<CellCoords *> blueNexts = getStartCoordsForBlue(board);
+    List<CellCoords> path;
 
-    ASSERT_FALSE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)(redNexts));
-    ASSERT_TRUE(Bfs(board, blueStraightNeighbourHelper, blueDoneVerifier)(blueNexts));
+    ASSERT_FALSE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)(redNexts, path));
+    ASSERT_TRUE(Bfs(board, blueStraightNeighbourHelper, blueDoneVerifier)(blueNexts, path));
 }

@@ -10,7 +10,7 @@ using data_structures::Vector;
 
 namespace board::algorithms {
 
-    bool Dfs::operator()(const List<CellCoords *> &startCoordsList, List<CellCoords> &path) const {
+    bool Dfs::operator()(List<CellCoords *> &startCoordsList, List<CellCoords> &path) const {
         VisitedType visited(mBoard.size());
         for (auto &row: visited) {
             row.init(mBoard.size());
@@ -19,17 +19,22 @@ namespace board::algorithms {
             visited[coords.row][coords.num] = true;
         }
         bool result = false;
-        for (const auto *coords: startCoordsList) {
-            if (visited[coords->row][coords->num])
+        while (!startCoordsList.empty()) {
+            auto *coords = startCoordsList.popFront();
+            if (visited[coords->row][coords->num]) {
+                delete coords;
                 continue;
+            }
             if (handleNode(visited, coords, path)) {
                 result = true;
                 path.pushBack(*coords);
+                delete coords;
                 break;
             }
-        }
-        for (auto *coords: startCoordsList) {
             delete coords;
+        }
+        while (!startCoordsList.empty()) {
+            delete startCoordsList.popFront();
         }
         return result;
     }

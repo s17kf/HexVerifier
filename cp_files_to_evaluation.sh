@@ -21,6 +21,7 @@ files_to_cp=(
 "board/algorithms/include/Bfs.h"
 "board/algorithms/include/Dfs.h"
 "board/algorithms/include/MinMax.h"
+"board/algorithms/include/WinVerificationAlgorithm.h"
 "board/src/Board.cpp"
 "board/src/BoardParser.cpp"
 "board/src/Cell.cpp"

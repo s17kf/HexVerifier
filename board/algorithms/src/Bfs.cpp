@@ -7,10 +7,13 @@
 
 namespace board::algorithms {
 
-    bool Bfs::operator()(List<CellCoords *> &nexts) {
+    bool Bfs::operator()(List<CellCoords *> &nexts, List<CellCoords> &path) const {
         VisitedType visited(mBoard.size());
         for (auto &row: visited) {
             row.init(mBoard.size());
+        }
+        for (const auto &coords: path) {
+            visited[coords.row][coords.num] = true;
         }
         bool result = false;
         while (!nexts.empty()) {
