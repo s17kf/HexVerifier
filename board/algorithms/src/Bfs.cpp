@@ -4,6 +4,7 @@
 
 #include "Bfs.h"
 
+using data_structures::List;
 
 namespace board::algorithms {
 

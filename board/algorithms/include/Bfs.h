@@ -23,7 +23,8 @@ namespace board::algorithms {
         Bfs(const Board &mBoard, const NeighboursHelper &mNeighboursHelper, const DoneVerifier &mDoneVerifier)
                 : mBoard(mBoard), mNeighboursHelper(mNeighboursHelper), mDoneVerifier(mDoneVerifier) {}
 
-        bool operator()(data_structures::List<CellCoords *> &nexts, List<CellCoords> &path) const override;
+        bool operator()(data_structures::List<CellCoords *> &nexts,
+                        data_structures::List<CellCoords> &path) const override;
 
         static void fillDistancesForEmptyCells(const Board &board,
                                                DistancesType &distancesToLeftBorder,
@@ -32,14 +33,16 @@ namespace board::algorithms {
                                                DistancesType &distancesToBottomBorder);
 
     private:
-        static inline void fillDistancesToOneBorder(const Board &board, List<CellCoords *> &nexts,
+        static inline void fillDistancesToOneBorder(const Board &board, data_structures::List<CellCoords *> &nexts,
                                                     EmptyNeighbourHelper &neighbourHelper);
 
         static inline void fillNextsAndUpdateDistancesInColumn(
-                const Board &board, List<CellCoords *> &nexts, DistancesType &distances, size_t col, Cell::Type color);
+                const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances, size_t col,
+                Cell::Type color);
 
         static inline void fillNextsAndUpdateDistancesInRow(
-                const Board &board, List<CellCoords *> &nexts, DistancesType &distances, size_t row, Cell::Type color);
+                const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances, size_t row,
+                Cell::Type color);
 
         static inline void initDistances(DistancesType &distances) {
             for (auto &row: distances) {

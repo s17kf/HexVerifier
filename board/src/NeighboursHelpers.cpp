@@ -5,6 +5,8 @@
 #include "NeighboursHelpers.h"
 #include "Board.h"
 
+using data_structures::List;
+
 namespace board {
 
     List<CellCoords *> NeighboursHelper::get(

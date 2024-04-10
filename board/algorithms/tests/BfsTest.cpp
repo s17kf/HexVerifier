@@ -18,6 +18,7 @@ using board::BlueStraightNeighbourHelper;
 using board::RedDoneVerifier;
 using board::BlueDoneVerifier;
 using data_structures::Vector;
+using data_structures::List;
 
 class BfsTest : public ::testing::Test {
 protected:

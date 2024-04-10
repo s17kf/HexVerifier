@@ -63,10 +63,10 @@ namespace board {
         [[nodiscard]] inline bool isGameWonByBlue(const DistancesType &distancesTpBottomBorder) const;
 
         [[nodiscard]] inline bool isGameWonByRed(
-                const algorithms::WinVerificationAlgorithm &algorithm, List<CellCoords> &path) const;
+                const algorithms::WinVerificationAlgorithm &algorithm, data_structures::List<CellCoords> &path) const;
 
         [[nodiscard]] inline bool isGameWonByBlue(
-                const algorithms::WinVerificationAlgorithm &algorithm, List<CellCoords> &path) const;
+                const algorithms::WinVerificationAlgorithm &algorithm, data_structures::List<CellCoords> &path) const;
 
         [[nodiscard]] inline bool canWinInNMovesWithNaive(
                 size_t n, bool movesFirst, const DistancesType &distancesToFirstBorder,
