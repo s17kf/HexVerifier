@@ -87,8 +87,22 @@ namespace board {
                     printf("NO\n");
                 return;
             }
+        } else {
+            if (color == "RED") {
+                if (board->canRedWinInNMovesWithPerfect(moves, distancesKeeper))
+                    printf("YES\n");
+                else
+                    printf("NO\n");
+                return;
+            }
+            else {
+                if (board->canBlueWinInNMovesWithPerfect(moves, distancesKeeper))
+                    printf("YES\n");
+                else
+                    printf("NO\n");
+                return;
+            }
         }
-
         printf("%s: query is not handled yet\n", query->c_str());
     }
 
@@ -107,7 +121,7 @@ namespace board {
                 continue;
             }
             handleQuery(lastLine, board, distancesKeeper);
-            printf("\n");
+//            printf("\n");
             delete lastLine;
             lastLine = inputReader.getLine();
         }

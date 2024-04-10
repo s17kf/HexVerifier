@@ -3,6 +3,7 @@
 //
 
 #include "Bfs.h"
+#include "Board.h"
 
 using data_structures::List;
 

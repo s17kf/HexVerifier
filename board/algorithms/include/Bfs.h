@@ -6,56 +6,61 @@
 #define HEX_BFS_H
 
 #include "WinVerificationAlgorithm.h"
-#include "Board.h"
 #include "DoneVerifiers.h"
 #include "List.h"
 #include "Vector.h"
 #include "NeighboursHelpers.h"
 
 
-namespace board::algorithms {
+namespace board {
+    class Board;
 
-    class Bfs : public WinVerificationAlgorithm {
-    public:
-        typedef NeighboursHelper::VisitedType VisitedType;
-        typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
+    namespace algorithms {
 
-        Bfs(const Board &mBoard, const NeighboursHelper &mNeighboursHelper, const DoneVerifier &mDoneVerifier)
-                : mBoard(mBoard), mNeighboursHelper(mNeighboursHelper), mDoneVerifier(mDoneVerifier) {}
+        class Bfs : public WinVerificationAlgorithm {
+        public:
+            typedef NeighboursHelper::VisitedType VisitedType;
+            typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
 
-        bool operator()(data_structures::List<CellCoords *> &nexts,
-                        data_structures::List<CellCoords> &path) const override;
+            Bfs(const Board &mBoard, const NeighboursHelper &mNeighboursHelper, const DoneVerifier &mDoneVerifier)
+                    : mBoard(mBoard), mNeighboursHelper(mNeighboursHelper), mDoneVerifier(mDoneVerifier) {}
 
-        static void fillDistancesForEmptyCells(const Board &board,
-                                               DistancesType &distancesToLeftBorder,
-                                               DistancesType &distancesToRightBorder,
-                                               DistancesType &distancesToTopBorder,
-                                               DistancesType &distancesToBottomBorder);
+            bool operator()(data_structures::List<CellCoords *> &nexts,
+                            data_structures::List<CellCoords> &path) const override;
 
-    private:
-        static inline void fillDistancesToOneBorder(const Board &board, data_structures::List<CellCoords *> &nexts,
-                                                    EmptyNeighbourHelper &neighbourHelper);
+            static void fillDistancesForEmptyCells(const Board &board,
+                                                   DistancesType &distancesToLeftBorder,
+                                                   DistancesType &distancesToRightBorder,
+                                                   DistancesType &distancesToTopBorder,
+                                                   DistancesType &distancesToBottomBorder);
 
-        static inline void fillNextsAndUpdateDistancesInColumn(
-                const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances, size_t col,
-                Cell::Type color);
+        private:
+            static inline void fillDistancesToOneBorder(const Board &board, data_structures::List<CellCoords *> &nexts,
+                                                        EmptyNeighbourHelper &neighbourHelper);
 
-        static inline void fillNextsAndUpdateDistancesInRow(
-                const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances, size_t row,
-                Cell::Type color);
+            static inline void fillNextsAndUpdateDistancesInColumn(
+                    const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances,
+                    size_t col,
+                    Cell::Type color);
 
-        static inline void initDistances(DistancesType &distances) {
-            for (auto &row: distances) {
-                row.init(distances.size());
-                std::fill_n(row.begin(), distances.size(), SIZE_MAX);
+            static inline void fillNextsAndUpdateDistancesInRow(
+                    const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances,
+                    size_t row,
+                    Cell::Type color);
+
+            static inline void initDistances(DistancesType &distances) {
+                for (auto &row: distances) {
+                    row.init(distances.size());
+                    std::fill_n(row.begin(), distances.size(), SIZE_MAX);
+                }
             }
-        }
 
-        const Board &mBoard;
-        const NeighboursHelper &mNeighboursHelper;
-        const DoneVerifier &mDoneVerifier;
-    };
+            const Board &mBoard;
+            const NeighboursHelper &mNeighboursHelper;
+            const DoneVerifier &mDoneVerifier;
+        };
 
-} // board::algorithms
+    } // algorithms
+} // board
 
 #endif //HEX_BFS_H

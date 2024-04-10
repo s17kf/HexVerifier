@@ -2,12 +2,14 @@
 // Created by stefan on 01/04/24.
 //
 
+#include <climits>
 #include "Board.h"
 
 #include "DoneVerifiers.h"
 #include "NeighboursHelpers.h"
 #include "Dfs.h"
 #include "Bfs.h"
+#include "MinMax.h"
 
 
 using data_structures::Vector;
@@ -17,17 +19,21 @@ namespace board {
     using algorithms::Dfs;
     using algorithms::Bfs;
     using algorithms::WinVerificationAlgorithm;
+    using algorithms::MinMax;
 
-    Board::Board(size_t size) : mSize(size),
-                                mRedCellsCount(0),
-                                mBlueCellsCount(0),
-                                mBoard(size),
-                                mRedDoneVerifier(*this),
-                                mBlueDoneVerifier(*this),
-                                mRedNeighboursHelper(*this),
-                                mBlueNeighboursHelper(*this),
-                                mRedStraightNeighboursHelper(*this),
-                                mBlueStraightNeighboursHelper(*this) {
+    Board::Board(size_t size) :
+            mSize(size),
+            mRedCellsCount(0),
+            mBlueCellsCount(0),
+            mBoard(size),
+            mRedDoneVerifier(*this),
+            mBlueDoneVerifier(*this),
+            mRedNeighboursHelper(*this),
+            mBlueNeighboursHelper(*this),
+            mRedStraightNeighboursHelper(*this),
+            mBlueStraightNeighboursHelper(*this),
+            mBfsForRed(*this, mRedStraightNeighboursHelper, mRedDoneVerifier),
+            mBfsForBlue(*this, mBlueStraightNeighboursHelper, mBlueDoneVerifier) {
         for (auto &row: mBoard) {
             row.init(size);
         }
@@ -80,7 +86,17 @@ namespace board {
         return false;
     }
 
-    bool Board::isGameWonByRed(const WinVerificationAlgorithm &algorithm, List<CellCoords> &path) const {
+    bool Board::isGameWonByRed(const WinVerificationAlgorithm &algorithm) const {
+        List<CellCoords> path;
+        return isGameWonByRed(algorithm, path);
+    }
+
+    bool Board::isGameWonByBlue(const WinVerificationAlgorithm &algorithm) const {
+        List<CellCoords> path;
+        return isGameWonByBlue(algorithm, path);
+    }
+
+    bool Board::isGameWonByRed(const WinVerificationAlgorithm &algorithm, List <CellCoords> &path) const {
         List<CellCoords *> startCoordsList;
         for (size_t row = 0u; row < size(); ++row) {
             if (getType(row, 0) == Cell::Type::red)
@@ -89,7 +105,7 @@ namespace board {
         return algorithm(startCoordsList, path);
     }
 
-    bool Board::isGameWonByBlue(const WinVerificationAlgorithm &algorithm, List<CellCoords> &path) const {
+    bool Board::isGameWonByBlue(const WinVerificationAlgorithm &algorithm, List <CellCoords> &path) const {
         List<CellCoords *> startCoordsList;
         for (size_t num = 0u; num < size(); ++num) {
             if (getType(0, num) == Cell::Type::blue)
@@ -202,6 +218,72 @@ namespace board {
                (oneMoveWiningCellExist && (idleMoveCellToFirstBorderExist || idleMoveCellToSecondBorderExist));
     }
 
+    bool Board::canRedWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper) {
+        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
+            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+            return false;
+        }
+        bool movesFirst = mRedCellsCount == mBlueCellsCount;
+        size_t neededSteps = movesFirst ? 2 * n - 1 : 2 * n;
+        if (neededSteps > getColorCount(Cell::Type::empty) || !isBoardCorrect()) {
+            return false;
+        }
+        MinMax minMax(*this, distancesKeeper, mBfsForRed, mBfsForBlue);
+        List<CellCoords> playerPossibleMoves;
+        fillEmptyCells(playerPossibleMoves, distancesKeeper.getDistancesToLeftBorder(),
+                       distancesKeeper.getDistancesToRightBorder(), n);
+        if (playerPossibleMoves.size() < neededSteps)
+            return false;
+        List<CellCoords> opponentPossibleMoves;
+        size_t opponentMoves = movesFirst ? n - 1 : n;
+        fillEmptyCells(
+                opponentPossibleMoves, distancesKeeper.getDistancesToTopBorder(),
+                distancesKeeper.getDistancesToBottomBorder(), distancesKeeper.getDistancesToLeftBorder(),
+                distancesKeeper.getDistancesToRightBorder(), opponentMoves, n + 1);
+        if (movesFirst) {
+            return MinMax::WIN_VALUE == minMax.evaluate(
+                    neededSteps, MinMax::PlayerType::max, Cell::Type::red,
+                    Cell::Type::blue, playerPossibleMoves, opponentPossibleMoves);
+        } else {
+            return MinMax::WIN_VALUE == minMax.evaluate(
+                    neededSteps, algorithms::MinMax::PlayerType::min, Cell::Type::blue,
+                    Cell::Type::red, opponentPossibleMoves, playerPossibleMoves);
+        }
+    }
+
+    bool Board::canBlueWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper) {
+        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
+            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+            return false;
+        }
+        bool movesFirst = mRedCellsCount > mBlueCellsCount;
+        size_t neededSteps = movesFirst ? 2 * n - 1 : 2 * n;
+        if (neededSteps > getColorCount(Cell::Type::empty) || !isBoardCorrect()) {
+            return false;
+        }
+        MinMax minMax(*this, distancesKeeper, mBfsForRed, mBfsForBlue);
+        List<CellCoords> playerPossibleMoves;
+        fillEmptyCells(playerPossibleMoves, distancesKeeper.getDistancesToTopBorder(),
+                       distancesKeeper.getDistancesToBottomBorder(), n);
+        if (playerPossibleMoves.size() < neededSteps)
+            return false;
+        List<CellCoords> opponentPossibleMoves;
+        size_t opponentMoves = movesFirst ? n - 1 : n;
+        fillEmptyCells(
+                opponentPossibleMoves, distancesKeeper.getDistancesToLeftBorder(),
+                distancesKeeper.getDistancesToRightBorder(), distancesKeeper.getDistancesToTopBorder(),
+                distancesKeeper.getDistancesToBottomBorder(), opponentMoves, n + 1);
+        if (movesFirst) {
+            return MinMax::WIN_VALUE == minMax.evaluate(
+                    neededSteps, MinMax::PlayerType::max, Cell::Type::blue,
+                    Cell::Type::red, playerPossibleMoves, opponentPossibleMoves);
+        } else {
+            return MinMax::WIN_VALUE == minMax.evaluate(
+                    neededSteps, algorithms::MinMax::PlayerType::min, Cell::Type::red,
+                    Cell::Type::blue, opponentPossibleMoves, playerPossibleMoves);
+        }
+    }
+
     void Board::setType(size_t row, size_t num, CellType type) {
         if (getType(row, num) != Cell::Type::empty)
             decColorCount(getType(row, num));
@@ -243,6 +325,45 @@ namespace board {
             for (size_t num = 0u; num < size(); ++num) {
                 if (mBoard[row][num].getType() == Cell::Type::empty) {
                     cellList.pushBack(new CellCoords{row, num});
+                }
+            }
+        }
+    }
+
+    void Board::fillEmptyCells(List <CellCoords> &cellList, const DistancesType &playerDistances1,
+                               const DistancesType &playerDistances2, size_t maxDistance) {
+        bool canAddIdleCell = maxDistance > 1;
+        for (size_t row = 0u; row < size(); ++row) {
+            for (size_t num = 0u; num < size(); ++num) {
+                if (mBoard[row][num].getType() == Cell::Type::empty){
+                    if(playerDistances1[row][num] <= maxDistance && playerDistances2[row][num] <= maxDistance) {
+                        cellList.pushBack({row, num});
+                        continue;
+                    }
+                    if(canAddIdleCell) {
+                        cellList.pushBack({row,num});
+                        canAddIdleCell = false;
+                    }
+                }
+            }
+        }
+    }
+
+    void Board::fillEmptyCells(List <CellCoords> &cellList,
+                               const DistancesType &playerDistances1,
+                               const DistancesType &playerDistances2,
+                               const DistancesType &opponentDistances1,
+                               const DistancesType &opponentDistances2,
+                               size_t playerMaxDistance,
+                               size_t opponentMaxDistance) {
+        for (size_t row = 0u; row < size(); ++row) {
+            for (size_t num = 0u; num < size(); ++num) {
+                if (mBoard[row][num].getType() == Cell::Type::empty &&
+                    ((playerDistances1[row][num] <= playerMaxDistance &&
+                      playerDistances2[row][num] <= playerMaxDistance) ||
+                     (opponentDistances1[row][num] <= opponentMaxDistance &&
+                      opponentDistances2[row][num] <= opponentMaxDistance))) {
+                    cellList.pushBack({row, num});
                 }
             }
         }

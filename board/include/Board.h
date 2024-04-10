@@ -10,12 +10,13 @@
 #include "DoneVerifiers.h"
 #include "NeighboursHelpers.h"
 #include "DistancesKeeper.h"
+#include "Bfs.h"
 
 
 namespace board {
-    namespace algorithms {
-        class WinVerificationAlgorithm;
-    }
+//    namespace algorithms {
+//        class WinVerificationAlgorithm;
+//    }
 
     class Board {
     public:
@@ -41,11 +42,19 @@ namespace board {
 
         [[nodiscard]] bool isGameWonByBlue(const DistancesKeeper &distancesKeeper) const;
 
+        [[nodiscard]] bool isGameWonByRed(const algorithms::WinVerificationAlgorithm &algorithm) const;
+
+        [[nodiscard]] bool isGameWonByBlue(const algorithms::WinVerificationAlgorithm &algorithm) const;
+
         [[nodiscard]] bool isBoardPossible() const;
 
         bool canRedWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper);
 
         bool canBlueWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper);
+
+        bool canRedWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper);
+
+        bool canBlueWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper);
 
         [[nodiscard]] inline Cell::Type getType(size_t row, size_t num) const {
             return mBoard[row][num].getType();
@@ -74,6 +83,18 @@ namespace board {
 
         inline void fillEmptyCells(data_structures::List<CellCoords *> &cellList);
 
+        inline void fillEmptyCells(
+                data_structures::List<CellCoords> &cellList, const DistancesType &playerDistances1,
+                const DistancesType &playerDistances2, size_t maxDistance);
+
+        inline void fillEmptyCells(data_structures::List<CellCoords> &cellList,
+                                   const DistancesType &playerDistances1,
+                                   const DistancesType &playerDistances2,
+                                   const DistancesType &opponentDistances1,
+                                   const DistancesType &opponentDistances2,
+                                   size_t playerMaxDistance,
+                                   size_t opponentMaxDistance);
+
         size_t mSize;
         size_t mRedCellsCount;
         size_t mBlueCellsCount;
@@ -84,6 +105,8 @@ namespace board {
         BlueNeighboursHelper mBlueNeighboursHelper;
         RedStraightNeighbourHelper mRedStraightNeighboursHelper;
         BlueStraightNeighbourHelper mBlueStraightNeighboursHelper;
+        const algorithms::Bfs mBfsForRed;
+        const algorithms::Bfs mBfsForBlue;
     };
 
 } // board

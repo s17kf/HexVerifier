@@ -5,14 +5,38 @@
 #ifndef HEX_MINMAX_H
 #define HEX_MINMAX_H
 
-namespace board {
-    namespace algorithms {
+#include "Board.h"
+#include "DistancesKeeper.h"
+#include "List.h"
+#include "Bfs.h"
+#include "Dfs.h"
 
-        class MinMax {
+namespace board::algorithms {
 
+    class MinMax {
+    public:
+        static const char WIN_VALUE = 1;
+        static const char LOSE_VALUE = -1;
+
+        enum class PlayerType {
+            min,
+            max,
         };
 
-    } // algorithms
-} // board
+        MinMax(Board &board, const DistancesKeeper &distanceKeeper, const Bfs &bfsForRed, const Bfs &bfsForBlue)
+                : mBoard(board), mDistanceKeeper(distanceKeeper), mBfsForRed(bfsForRed), mBfsForBlue(bfsForBlue) {}
+
+        char evaluate(size_t stepsLeft, PlayerType playerType, Cell::Type playerColor, Cell::Type opponentColor,
+                      const data_structures::List<CellCoords> &cellsToPlayByPlayer,
+                      const data_structures::List<CellCoords> &cellsToPlayByOpponent);
+
+    private:
+        Board &mBoard;
+        const DistancesKeeper &mDistanceKeeper;
+        const Bfs &mBfsForRed;
+        const Bfs &mBfsForBlue;
+    };
+
+} // board::algorithms
 
 #endif //HEX_MINMAX_H
