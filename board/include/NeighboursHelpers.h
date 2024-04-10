@@ -21,6 +21,8 @@ namespace board {
 
         explicit NeighboursHelper(const Board &mBoard) : mBoard(mBoard) {}
 
+        NeighboursHelper(const NeighboursHelper&) = delete;
+
         virtual ~NeighboursHelper() = default;
 
         virtual void fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
@@ -70,6 +72,22 @@ namespace board {
 
         void fill(data_structures::List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                   const VisitedType *visited, bool emptyAllowed) const override;
+    };
+
+    class RedStraightNeighbourHelper : public NeighboursHelper {
+    public:
+        explicit RedStraightNeighbourHelper(const Board &mBoard) : NeighboursHelper(mBoard) {}
+
+        void fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords, const VisitedType *visited,
+                  bool emptyAllowed) const override;
+    };
+
+    class BlueStraightNeighbourHelper : public NeighboursHelper {
+    public:
+        explicit BlueStraightNeighbourHelper(const Board &mBoard) : NeighboursHelper(mBoard) {}
+
+        void fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords, const VisitedType *visited,
+                  bool emptyAllowed) const override;
     };
 
     class DistanceUpdater {

@@ -12,12 +12,16 @@ namespace board {
 
     class DoneVerifier {
     public:
+        DoneVerifier() = default;
+
+        DoneVerifier(const DoneVerifier &) = delete;
+
         virtual bool operator()(const CellCoords *cellCoords) const = 0;
     };
 
     class RedDoneVerifier : public DoneVerifier {
     public:
-        explicit RedDoneVerifier(const Board &mBoard) : mBoard(mBoard) {}
+        explicit RedDoneVerifier(const Board &board) : mBoard(board) {}
 
         bool operator()(const CellCoords *cellCoords) const override;
 
@@ -27,7 +31,7 @@ namespace board {
 
     class BlueDoneVerifier : public DoneVerifier {
     public:
-        explicit BlueDoneVerifier(const Board &mBoard) : mBoard(mBoard) {}
+        explicit BlueDoneVerifier(const Board &board) : mBoard(board) {}
 
         bool operator()(const CellCoords *cellCoords) const override;
 

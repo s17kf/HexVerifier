@@ -20,6 +20,7 @@ files_to_cp=(
 #"board/include/WinVerifiers.h"
 "board/algorithms/include/Bfs.h"
 "board/algorithms/include/Dfs.h"
+"board/algorithms/include/MinMax.h"
 "board/src/Board.cpp"
 "board/src/BoardParser.cpp"
 "board/src/Cell.cpp"
@@ -29,6 +30,7 @@ files_to_cp=(
 "board/src/NeighboursHelpers.cpp"
 "board/algorithms/src/Bfs.cpp"
 "board/algorithms/src/Dfs.cpp"
+"board/algorithms/src/MinMax.cpp"
 
 "utils/include/InputReader.h"
 "utils/include/InputReaderImpl.h"

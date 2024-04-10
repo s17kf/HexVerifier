@@ -3,50 +3,79 @@
 //
 
 #include "Bfs.h"
-#include "NeighboursHelpers.h"
 
 
 namespace board::algorithms {
 
-    void Bfs::fillDistancesForEmptyCells(Bfs::DistancesType &distancesToLeftBorder,
-                                         Bfs::DistancesType &distancesToRightBorder,
-                                         Bfs::DistancesType &distancesToTopBorder,
-                                         Bfs::DistancesType &distancesToBottomBorder) {
+    bool Bfs::operator()(List<CellCoords *> &nexts) {
+        VisitedType visited(mBoard.size());
+        for (auto &row: visited) {
+            row.init(mBoard.size());
+        }
+        bool result = false;
+        while (!nexts.empty()) {
+            auto *next = nexts.popFront();
+            if(visited[next->row][next->num]){
+                delete next;
+                continue;
+            }
+            visited[next->row][next->num] = true;
+            if (mDoneVerifier(next)){
+                result = true;
+                delete next;
+                break;
+            }
+            mNeighboursHelper.fill(nexts, next, &visited, false);
+            delete next;
+        }
+        while(!nexts.empty()){
+            delete nexts.popFront();
+        }
+        return result;
+    }
 
+    void Bfs::fillDistancesForEmptyCells(const Board &board,
+                                         DistancesType &distancesToLeftBorder,
+                                         DistancesType &distancesToRightBorder,
+                                         DistancesType &distancesToTopBorder,
+                                         DistancesType &distancesToBottomBorder) {
         initDistances(distancesToLeftBorder);
         initDistances(distancesToRightBorder);
         initDistances(distancesToTopBorder);
         initDistances(distancesToBottomBorder);
         {
             List<CellCoords *> nexts;
-            fillNextsAndUpdateDistancesInColumn(nexts, distancesToLeftBorder, 0, Cell::Type::red);
-            EmptyNeighbourHelper neighbourHelper(mBoard, Cell::Type::red, distancesToLeftBorder);
-            fillDistancesToOneBorder(nexts, neighbourHelper);
+            fillNextsAndUpdateDistancesInColumn(board, nexts, distancesToLeftBorder, 0, Cell::Type::red);
+            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::red, distancesToLeftBorder);
+            fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
         {
             List<CellCoords *> nexts;
-            fillNextsAndUpdateDistancesInColumn(nexts, distancesToRightBorder, mBoard.size() - 1, Cell::Type::red);
-            EmptyNeighbourHelper neighbourHelper(mBoard, Cell::Type::red, distancesToRightBorder);
-            fillDistancesToOneBorder(nexts, neighbourHelper);
+            fillNextsAndUpdateDistancesInColumn(board, nexts, distancesToRightBorder, board.size() - 1,
+                                                Cell::Type::red);
+            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::red, distancesToRightBorder);
+            fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
         {
             List<CellCoords *> nexts;
-            fillNextsAndUpdateDistancesInRow(nexts, distancesToTopBorder, 0, Cell::Type::blue);
-            EmptyNeighbourHelper neighbourHelper(mBoard, Cell::Type::blue, distancesToTopBorder);
-            fillDistancesToOneBorder(nexts, neighbourHelper);
+            fillNextsAndUpdateDistancesInRow(board, nexts, distancesToTopBorder, 0, Cell::Type::blue);
+            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::blue, distancesToTopBorder);
+            fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
         {
             List<CellCoords *> nexts;
-            fillNextsAndUpdateDistancesInRow(nexts, distancesToBottomBorder, mBoard.size() - 1, Cell::Type::blue);
-            EmptyNeighbourHelper neighbourHelper(mBoard, Cell::Type::blue, distancesToBottomBorder);
-            fillDistancesToOneBorder(nexts, neighbourHelper);
+            fillNextsAndUpdateDistancesInRow(board, nexts, distancesToBottomBorder, board.size() - 1,
+                                             Cell::Type::blue);
+            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::blue, distancesToBottomBorder);
+            fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
     }
 
-    void Bfs::fillDistancesToOneBorder(List<CellCoords *> &nexts, EmptyNeighbourHelper &neighbourHelper) {
-        VisitedType visited(mBoard.size());
+    void Bfs::fillDistancesToOneBorder(const Board &board, List<CellCoords *> &nexts,
+                                       EmptyNeighbourHelper &neighbourHelper) {
+        VisitedType visited(board.size());
         for (auto &row: visited) {
-            row.init(mBoard.size());
+            row.init(board.size());
         }
         while (!nexts.empty()) {
             auto *coords = nexts.popFront();
@@ -55,30 +84,30 @@ namespace board::algorithms {
         }
     }
 
-    void Bfs::fillNextsAndUpdateDistancesInColumn(List<CellCoords *> &nexts, DistancesType &distances, size_t col,
-                                                  Cell::Type color) {
-        for (size_t row = 0u; row < mBoard.size(); ++row) {
-            if (mBoard.getType(row, col) == color) {
+    void Bfs::fillNextsAndUpdateDistancesInColumn(const Board &board, List<CellCoords *> &nexts,
+                                                  DistancesType &distances, size_t col, Cell::Type color) {
+        for (size_t row = 0u; row < board.size(); ++row) {
+            if (board.getType(row, col) == color) {
                 distances[row][col] = 0;
                 nexts.pushBack(new CellCoords{row, col});
                 continue;
             }
-            if (mBoard.getType(row, col) == Cell::Type::empty) {
+            if (board.getType(row, col) == Cell::Type::empty) {
                 distances[row][col] = 1;
                 nexts.pushBack(new CellCoords{row, col});
             }
         }
     }
 
-    void Bfs::fillNextsAndUpdateDistancesInRow(List<CellCoords *> &nexts, Bfs::DistancesType &distances, size_t row,
-                                               Cell::Type color) {
-        for (size_t num = 0u; num < mBoard.size(); ++num) {
-            if (mBoard.getType(row, num) == color) {
+    void Bfs::fillNextsAndUpdateDistancesInRow(const Board &board, List<CellCoords *> &nexts,
+                                               Bfs::DistancesType &distances, size_t row, Cell::Type color) {
+        for (size_t num = 0u; num < board.size(); ++num) {
+            if (board.getType(row, num) == color) {
                 distances[row][num] = 0;
                 nexts.pushBack(new CellCoords{row, num});
                 continue;
             }
-            if (mBoard.getType(row, num) == Cell::Type::empty) {
+            if (board.getType(row, num) == Cell::Type::empty) {
                 distances[row][num] = 1;
                 nexts.pushBack(new CellCoords{row, num});
             }

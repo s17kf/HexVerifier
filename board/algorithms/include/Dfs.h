@@ -16,6 +16,8 @@ namespace board::algorithms {
 
     class Dfs {
     public:
+        typedef NeighboursHelper::VisitedType VisitedType;
+
         Dfs(const Board &mBoard, const NeighboursHelper &neighboursHelper, const DoneVerifier &doneVerifier)
                 : mBoard(mBoard), neighboursHelper(neighboursHelper), doneVerifier(doneVerifier) {}
 

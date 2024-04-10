@@ -11,7 +11,7 @@ using data_structures::Vector;
 namespace board::algorithms {
 
     bool Dfs::operator()(const List<CellCoords *> &startCoordsList, List<CellCoords> &path) const {
-        Vector<Vector<bool>> visited(mBoard.size());
+        VisitedType visited(mBoard.size());
         for (auto &row: visited) {
             row.init(mBoard.size());
         }
@@ -20,7 +20,7 @@ namespace board::algorithms {
         }
         bool result = false;
         for (const auto *coords: startCoordsList) {
-            if(visited[coords->row][coords->num])
+            if (visited[coords->row][coords->num])
                 continue;
             if (handleNode(visited, coords, path)) {
                 result = true;

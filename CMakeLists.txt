@@ -21,6 +21,7 @@ set(MAIN_SOURCES
         board/src/NeighboursHelpers.cpp
         board/algorithms/src/Dfs.cpp
         board/algorithms/src/Bfs.cpp
+        board/algorithms/src/MinMax.cpp
         utils/src/String.cpp
         utils/src/InputReaderImpl.cpp
 )
@@ -46,7 +47,9 @@ set(BOARD_TEST_SOURCES
         board/tests/BoardParserTest.cpp
         board/algorithms/src/Dfs.cpp
         board/algorithms/src/Bfs.cpp
+        board/algorithms/src/MinMax.cpp
         board/algorithms/tests/BfsTest.cpp
+        board/algorithms/tests/MinMaxTest.cpp
 )
 
 set(DATA_STRUCTURES_TEST_SOURCES

@@ -52,6 +52,31 @@ namespace board {
         }
     }
 
+    void RedStraightNeighbourHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
+                                          const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
+        auto row = cellCoords->row;
+        auto num = cellCoords->num;
+        addNeighbourRight(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+        addNeighbourBelowRight(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+        addNeighbourBelow(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+        addNeighbourAbove(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+        addNeighbourAboveLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+        addNeighbourLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+    }
+
+    void BlueStraightNeighbourHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
+                                           const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
+        auto row = cellCoords->row;
+        auto num = cellCoords->num;
+        addNeighbourBelow(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourBelowRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourAboveLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourAbove(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+
+    }
+
     void EmptyNeighbourHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                     const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
         auto row = cellCoords->row;
@@ -94,8 +119,7 @@ namespace board {
                                              const VisitedType *visited, bool emptyAllowed) const {
         if (row < mBoard.size() - 1 && num < mBoard.size() - 1) {
             addToListIfNotVisited(row + 1, num + 1, CellCoords::Direction::downRight, row, num, neighbours, visited,
-                                  color,
-                                  emptyAllowed);
+                                  color, emptyAllowed);
         }
     }
 

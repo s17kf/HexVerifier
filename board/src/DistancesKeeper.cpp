@@ -13,8 +13,8 @@ namespace board {
                                                            distancesToRightBorder(board.size()),
                                                            distancesToTopBorder(board.size()),
                                                            distancesToBottomBorder(board.size()) {
-        Bfs(board).fillDistancesForEmptyCells(distancesToLeftBorder, distancesToRightBorder, distancesToTopBorder,
-                                              distancesToBottomBorder);
+        Bfs::fillDistancesForEmptyCells(board, distancesToLeftBorder, distancesToRightBorder,
+                                        distancesToTopBorder, distancesToBottomBorder);
     }
 
 } // board

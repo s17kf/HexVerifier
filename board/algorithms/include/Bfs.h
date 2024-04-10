@@ -9,6 +9,7 @@
 #include "DoneVerifiers.h"
 #include "List.h"
 #include "Vector.h"
+#include "NeighboursHelpers.h"
 
 
 namespace board::algorithms {
@@ -18,31 +19,37 @@ namespace board::algorithms {
         typedef NeighboursHelper::VisitedType VisitedType;
         typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
 
-        explicit Bfs(const Board &board) : mBoard(board) {}
+        Bfs(const Board &mBoard, const NeighboursHelper &mNeighboursHelper, const DoneVerifier &mDoneVerifier)
+                : mBoard(mBoard), mNeighboursHelper(mNeighboursHelper), mDoneVerifier(mDoneVerifier) {}
 
+        bool operator()(data_structures::List<CellCoords *> &nexts);
 
-        void fillDistancesForEmptyCells(DistancesType &distancesToLeftBorder,
-                                        DistancesType &distancesToRightBorder,
-                                        DistancesType &distancesToTopBorder,
-                                        DistancesType &distancesToBottomBorder);
+        static void fillDistancesForEmptyCells(const Board &board,
+                                               DistancesType &distancesToLeftBorder,
+                                               DistancesType &distancesToRightBorder,
+                                               DistancesType &distancesToTopBorder,
+                                               DistancesType &distancesToBottomBorder);
 
     private:
-        inline void fillDistancesToOneBorder(List<CellCoords *> &nexts,
-                                             EmptyNeighbourHelper &neighbourHelper);
+        static inline void fillDistancesToOneBorder(const Board &board, List<CellCoords *> &nexts,
+                                                    EmptyNeighbourHelper &neighbourHelper);
 
-        inline void fillNextsAndUpdateDistancesInColumn(List<CellCoords *> &nexts, DistancesType &distances, size_t col,
-                                                        Cell::Type color);
+        static inline void fillNextsAndUpdateDistancesInColumn(
+                const Board &board, List<CellCoords *> &nexts, DistancesType &distances, size_t col, Cell::Type color);
 
-        inline void fillNextsAndUpdateDistancesInRow(List<CellCoords *> &nexts, DistancesType &distances, size_t row,
-                                                     Cell::Type color);
+        static inline void fillNextsAndUpdateDistancesInRow(
+                const Board &board, List<CellCoords *> &nexts, DistancesType &distances, size_t row, Cell::Type color);
 
-        inline void initDistances(DistancesType &distances) const {
+        static inline void initDistances(DistancesType &distances) {
             for (auto &row: distances) {
                 row.init(distances.size());
                 std::fill_n(row.begin(), distances.size(), SIZE_MAX);
-            }}
+            }
+        }
 
         const Board &mBoard;
+        const NeighboursHelper &mNeighboursHelper;
+        const DoneVerifier &mDoneVerifier;
     };
 
 } // board::algorithms
