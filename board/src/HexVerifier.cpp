@@ -11,6 +11,7 @@
 #include "String.h"
 
 using utils::String;
+using data_structures::List;
 
 namespace board {
 
@@ -56,7 +57,8 @@ namespace board {
             }
             return;
         }
-        auto splittedQuery = query->split('_');
+        List<String> splittedQuery;
+        query->split(splittedQuery, '_');
         auto wordIt = splittedQuery.begin();
         if(*(wordIt++) != "CAN") {
             printf("%s: query is NOT SUPPORTED!\n", query->c_str());

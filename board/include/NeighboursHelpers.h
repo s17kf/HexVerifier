@@ -27,9 +27,6 @@ namespace board {
         virtual void fill(data_structures::List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                           const VisitedType *visited, bool emptyAllowed) const = 0;
 
-        data_structures::List<CellCoords *> get(const CellCoords *cellCoords, const VisitedType *visited,
-                                                bool emptyAllowed) const;
-
     protected:
         void addNeighbourBelow(
                 size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,

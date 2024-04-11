@@ -7,13 +7,16 @@
 #include <cstring>
 #include <list>
 #include "String.h"
+#include "List.h"
 
 using utils::String;
+using data_structures::List;
 
 class StringTest : public ::testing::Test {
 protected:
     void verifySplitResult(const String &testedString, const std::list<std::string> &s1ExpectedParts) {
-        const auto splitResult = testedString.split();
+        List<String> splitResult;
+        testedString.split(splitResult);
         std::list<std::string> splitResultAsListOfStrings;
         for (auto &s: splitResult) {
             splitResultAsListOfStrings.emplace_back(s.c_str());

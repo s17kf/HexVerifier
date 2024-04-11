@@ -14,6 +14,8 @@ namespace board::algorithms {
     public:
         virtual bool operator()(data_structures::List<CellCoords *> &startCoordsList,
                                 data_structures::List<CellCoords> &path) const = 0;
+    protected:
+
     };
 
 } // board::algorithms

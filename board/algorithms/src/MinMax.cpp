@@ -41,13 +41,11 @@ namespace board::algorithms {
                                      cellsToPlayByOpponent, cellsToPlayByPlayer);
             if (playerType == PlayerType::min) {
                 if (newValue < bestValue) {
-//                    bestValue = newValue;
                     mBoard.setColor(coords.row, coords.num, Color::empty);
                     return newValue;
                 }
             } else { //  playerType == max
                 if (newValue > bestValue) {
-//                    bestValue = newValue;
                     if (stepsLeft > 2) {
                         if (playerColor == Color::red) {
                             if (mBoard.isGameWonByRed(mBfsForRed)) {

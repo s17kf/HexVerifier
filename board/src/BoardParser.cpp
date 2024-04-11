@@ -31,7 +31,8 @@ namespace board {
         auto *board = new Board(boardSize);
         auto lineIt = lines.begin();
         for (size_t line = 0u; line < lines.size(); ++line, ++lineIt) {
-            auto lineSplitted = (*lineIt)->split();
+            List<String> lineSplitted;
+            (*lineIt)->split(lineSplitted);
             size_t tokenInLine = 0u;
             for (auto &token: lineSplitted) {
                 size_t row = line < boardSize ? line - tokenInLine : boardSize - tokenInLine - 1;

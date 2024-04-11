@@ -135,8 +135,7 @@ namespace utils {
         return rstrip(c).lstrip(c);
     }
 
-    List<String> String::split(char delimiter) const {
-        List<String> result;
+    void String::split(List<String> &result, char delimiter) const {
         size_t startPos = 0u;
         for (size_t endPos = 0u; endPos < mSize; ++endPos) {
             if (mStr[endPos] != delimiter)
@@ -157,7 +156,6 @@ namespace utils {
             strncpy(result.back().mStr, &mStr[startPos], newPartSize);
             result.back().mSize = newPartSize;
         }
-        return result;
     }
 
 } // utils

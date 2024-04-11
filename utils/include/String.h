@@ -58,7 +58,7 @@ namespace utils {
 
         String &strip(char c = ' ');
 
-        data_structures::List<String> split(char delimiter = ' ') const;
+        void split(data_structures::List<String> &result, char delimiter = ' ') const;
 
     private:
         size_t mSize;

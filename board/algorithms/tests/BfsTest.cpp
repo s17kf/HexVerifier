@@ -47,24 +47,20 @@ protected:
         }
     }
 
-    List<CellCoords *> getStartCoordsForRed(const Board &board) {
-        List<CellCoords *> list;
+    void fillStartCoordsForRed(List<CellCoords *> &list, const Board &board) {
         for (size_t row = 0u; row < board.size(); ++row) {
             if (board.getColor(row, 0) == board::Color::red) {
                 list.pushBack(new CellCoords{row, 0});
             }
         }
-        return list;
     }
 
-    List<CellCoords *> getStartCoordsForBlue(const Board &board) {
-        List<CellCoords *> list;
+    void fillStartCoordsForBlue(List<CellCoords *> &list, const Board &board) {
         for (size_t num = 0u; num < board.size(); ++num) {
             if (board.getColor(0, num) == board::Color::blue) {
                 list.pushBack(new CellCoords{0, num});
             }
         }
-        return list;
     }
 };
 
@@ -203,8 +199,10 @@ TEST_F(BfsTest, bfsNoWinner) {
     BlueStraightNeighbourHelper blueStraightNeighbourHelper(board);
     RedDoneVerifier redDoneVerifier(board);
     BlueDoneVerifier blueDoneVerifier(board);
-    List<CellCoords *> redNexts = getStartCoordsForRed(board);
-    List<CellCoords *> blueNexts = getStartCoordsForBlue(board);
+    List<CellCoords *> redNexts;
+    fillStartCoordsForRed(redNexts, board);
+    List<CellCoords *> blueNexts;
+    fillStartCoordsForBlue(blueNexts, board);
     List<CellCoords> path;
 
     ASSERT_FALSE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)
@@ -246,8 +244,10 @@ TEST_F(BfsTest, bfsRedWin) {
     BlueStraightNeighbourHelper blueStraightNeighbourHelper(board);
     RedDoneVerifier redDoneVerifier(board);
     BlueDoneVerifier blueDoneVerifier(board);
-    List<CellCoords *> redNexts = getStartCoordsForRed(board);
-    List<CellCoords *> blueNexts = getStartCoordsForBlue(board);
+    List<CellCoords *> redNexts;
+    fillStartCoordsForRed(redNexts, board);
+    List<CellCoords *> blueNexts;
+    fillStartCoordsForBlue(blueNexts, board);
     List<CellCoords> path;
 
     ASSERT_TRUE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)(redNexts, path));
@@ -287,8 +287,10 @@ TEST_F(BfsTest, bfsBlueWin) {
     BlueStraightNeighbourHelper blueStraightNeighbourHelper(board);
     RedDoneVerifier redDoneVerifier(board);
     BlueDoneVerifier blueDoneVerifier(board);
-    List<CellCoords *> redNexts = getStartCoordsForRed(board);
-    List<CellCoords *> blueNexts = getStartCoordsForBlue(board);
+    List<CellCoords *> redNexts;
+    fillStartCoordsForRed(redNexts, board);
+    List<CellCoords *> blueNexts;
+    fillStartCoordsForBlue(blueNexts, board);
     List<CellCoords> path;
 
     ASSERT_FALSE(Bfs(board, redStraightNeighbourHelper, redDoneVerifier)(redNexts, path));

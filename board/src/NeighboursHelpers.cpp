@@ -9,13 +9,6 @@ using data_structures::List;
 
 namespace board {
 
-    List<CellCoords *> NeighboursHelper::get(
-            const CellCoords *cellCoords, const VisitedType *visited, bool emptyAllowed) const {
-        List<CellCoords *> neighbours;
-        fill(neighbours, cellCoords, visited, emptyAllowed);
-        return neighbours;
-    }
-
     void RedNeighboursHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                    const VisitedType *visited, bool emptyAllowed) const {
         auto row = cellCoords->row;

@@ -91,12 +91,7 @@ namespace data_structures {
             setUpEmptyListNodes();
         }
 
-        constexpr List(const List<T> &other) : mSize(other.mSize) {
-            setUpEmptyListNodes();
-            for (auto &item: other) {
-                pushBack(item);
-            }
-        }
+        List(const List<T> &other) = delete;
 
         List<T> &operator=(const List<T> &other) = delete;
 

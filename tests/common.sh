@@ -11,6 +11,7 @@ export GREEN_BG="\033[42m"
 export BLACK_BOLD="\033[1;30m"
 export YELLOW_BOLD="\033[1;33m"
 export WHITE_BOLD="\033[1;37m"
+export WHITE_UNDER="\033[4;37m"
 
 function verify_valgrind_output() {
     local output_file=$1
