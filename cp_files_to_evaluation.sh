@@ -17,7 +17,6 @@ files_to_cp=(
 "board/include/DistancesKeeper.h"
 "board/include/DoneVerifiers.h"
 "board/include/NeighboursHelpers.h"
-#"board/include/WinVerifiers.h"
 "board/algorithms/include/Bfs.h"
 "board/algorithms/include/Dfs.h"
 "board/algorithms/include/MinMax.h"
@@ -31,6 +30,7 @@ files_to_cp=(
 "board/algorithms/src/Bfs.cpp"
 "board/algorithms/src/Dfs.cpp"
 "board/algorithms/src/MinMax.cpp"
+"board/algorithms/src/WinVerificationAlgorithm.cpp"
 
 "utils/include/InputReader.h"
 "utils/include/InputReaderImpl.h"

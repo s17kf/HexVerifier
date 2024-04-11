@@ -28,7 +28,7 @@ namespace board {
 
         Board(const Board &) = delete;
 
-        inline size_t size() const {
+        [[nodiscard]] inline size_t size() const {
             return mSize;
         }
 

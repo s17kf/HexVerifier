@@ -11,12 +11,7 @@ namespace board::algorithms {
 
     bool Bfs::operator()(List<CellCoords *> &nexts, List<CellCoords> &path) const {
         VisitedType visited(mBoard.size());
-        for (auto &row: visited) {
-            row.init(mBoard.size());
-        }
-        for (const auto &coords: path) {
-            visited[coords.row][coords.num] = true;
-        }
+        initVisited(visited, path, mBoard);
         bool result = false;
         while (!nexts.empty()) {
             auto *next = nexts.popFront();
@@ -84,7 +79,7 @@ namespace board::algorithms {
         }
         while (!nexts.empty()) {
             auto *coords = nexts.popFront();
-            neighbourHelper.fill(nexts, coords, nullptr);
+            neighbourHelper.fill(nexts, coords, nullptr, false);
             delete coords;
         }
     }

@@ -104,7 +104,7 @@ namespace board {
 
         void updateDistance(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
 
-        bool shouldVisit(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
+        [[nodiscard]] bool shouldVisit(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
 
     private:
         const Board &mBoard;
@@ -123,7 +123,7 @@ namespace board {
 
         void fill(
                 data_structures::List<CellCoords *> &neighbours, const CellCoords *cellCoords,
-                const VisitedType *visited, bool emptyAllowed = true) const override;
+                const VisitedType *visited, bool emptyAllowed) const override;
 
 
     protected:

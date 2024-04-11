@@ -22,6 +22,7 @@ set(MAIN_SOURCES
         board/algorithms/src/Dfs.cpp
         board/algorithms/src/Bfs.cpp
         board/algorithms/src/MinMax.cpp
+        board/algorithms/src/WinVerificationAlgorithm.cpp
         utils/src/String.cpp
         utils/src/InputReaderImpl.cpp
 )
@@ -47,6 +48,7 @@ set(BOARD_TEST_SOURCES
         board/algorithms/src/Dfs.cpp
         board/algorithms/src/Bfs.cpp
         board/algorithms/src/MinMax.cpp
+        board/algorithms/src/WinVerificationAlgorithm.cpp
         board/algorithms/tests/BfsTest.cpp
         board/algorithms/tests/MinMaxTest.cpp
 )

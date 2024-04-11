@@ -19,7 +19,6 @@ namespace board {
 
         class Bfs : public WinVerificationAlgorithm {
         public:
-            typedef NeighboursHelper::VisitedType VisitedType;
             typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
 
             Bfs(const Board &mBoard, const NeighboursHelper &mNeighboursHelper, const DoneVerifier &mDoneVerifier)

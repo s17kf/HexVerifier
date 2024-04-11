@@ -12,12 +12,7 @@ namespace board::algorithms {
 
     bool Dfs::operator()(List<CellCoords *> &startCoordsList, List<CellCoords> &path) const {
         VisitedType visited(mBoard.size());
-        for (auto &row: visited) {
-            row.init(mBoard.size());
-        }
-        for (const auto &coords: path) {
-            visited[coords.row][coords.num] = true;
-        }
+        initVisited(visited,path, mBoard);
         bool result = false;
         while (!startCoordsList.empty()) {
             auto *coords = startCoordsList.popFront();
@@ -39,7 +34,7 @@ namespace board::algorithms {
         return result;
     }
 
-    bool Dfs::handleNode(Vector<Vector<bool>> &visited, const CellCoords *coords, List<CellCoords> &path) const {
+    bool Dfs::handleNode(VisitedType &visited, const CellCoords *coords, List<CellCoords> &path) const {
         visited[coords->row][coords->num] = true;
         if (doneVerifier(coords)) {
             return true;

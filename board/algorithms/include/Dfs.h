@@ -17,8 +17,6 @@ namespace board::algorithms {
 
     class Dfs : public WinVerificationAlgorithm {
     public:
-        typedef NeighboursHelper::VisitedType VisitedType;
-
         Dfs(const Board &mBoard, const NeighboursHelper &neighboursHelper, const DoneVerifier &doneVerifier)
                 : mBoard(mBoard), neighboursHelper(neighboursHelper), doneVerifier(doneVerifier) {}
 
@@ -26,7 +24,7 @@ namespace board::algorithms {
                         data_structures::List<CellCoords> &path) const override;
 
     private:
-        bool handleNode(data_structures::Vector<data_structures::Vector<bool>> &visited,
+        bool handleNode(VisitedType &visited,
                         const CellCoords *coords, data_structures::List<CellCoords> &path) const;
 
         const Board &mBoard;
