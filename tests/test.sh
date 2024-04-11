@@ -6,6 +6,7 @@ source "common.sh"
 
 test_file_base_names=(
 "canWinWithNaive"
+"canWinWithPerfect"
 "isBoardPossible"
 "isGameOver"
 )
