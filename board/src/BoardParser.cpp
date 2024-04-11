@@ -41,10 +41,10 @@ namespace board {
                         ++tokenInLine;
                         continue;
                     case 'r':
-                        board->setType(row, num, Cell::Type::red);
+                        board->setColor(row, num, Color::red);
                         continue;
                     case 'b':
-                        board->setType(row, num, Cell::Type::blue);
+                        board->setColor(row, num, Color::blue);
                         continue;
                 }
             }

@@ -5,7 +5,7 @@
 #ifndef HEX_CELLCOORDS_H
 #define HEX_CELLCOORDS_H
 
-#include "Cell.h"
+#include <cstdlib>
 
 namespace board {
 

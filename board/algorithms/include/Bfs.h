@@ -41,12 +41,12 @@ namespace board {
             static inline void fillNextsAndUpdateDistancesInColumn(
                     const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances,
                     size_t col,
-                    Cell::Type color);
+                    Color color);
 
             static inline void fillNextsAndUpdateDistancesInRow(
                     const Board &board, data_structures::List<CellCoords *> &nexts, DistancesType &distances,
                     size_t row,
-                    Cell::Type color);
+                    Color color);
 
             static inline void initDistances(DistancesType &distances) {
                 for (auto &row: distances) {

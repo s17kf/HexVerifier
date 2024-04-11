@@ -40,13 +40,13 @@ namespace board {
     }
 
 
-    size_t Board::getColorCount(Cell::Type color) const {
+    size_t Board::getColorCount(Color color) const {
         switch (color) {
-            case Cell::Type::red:
+            case Color::red:
                 return mRedCellsCount;
-            case Cell::Type::blue:
+            case Color::blue:
                 return mBlueCellsCount;
-            case Cell::Type::empty:
+            case Color::empty:
                 return mSize * mSize - mRedCellsCount - mBlueCellsCount;
         }
         throw std::invalid_argument("Get color count - invalid color!");
@@ -54,8 +54,8 @@ namespace board {
 
 
     bool Board::isBoardCorrect() const {
-        auto redPawns = getColorCount(Cell::Type::red);
-        auto bluePawns = getColorCount(Cell::Type::blue);
+        auto redPawns = getColorCount(Color::red);
+        auto bluePawns = getColorCount(Color::blue);
         if (redPawns < bluePawns || redPawns > bluePawns + 1) {
             return false;
         }
@@ -99,7 +99,7 @@ namespace board {
     bool Board::isGameWonByRed(const WinVerificationAlgorithm &algorithm, List <CellCoords> &path) const {
         List<CellCoords *> startCoordsList;
         for (size_t row = 0u; row < size(); ++row) {
-            if (getType(row, 0) == Cell::Type::red)
+            if (getColor(row, 0) == Color::red)
                 startCoordsList.pushBack(new CellCoords{row, 0, CellCoords::Direction::right});
         }
         return algorithm(startCoordsList, path);
@@ -108,7 +108,7 @@ namespace board {
     bool Board::isGameWonByBlue(const WinVerificationAlgorithm &algorithm, List <CellCoords> &path) const {
         List<CellCoords *> startCoordsList;
         for (size_t num = 0u; num < size(); ++num) {
-            if (getType(0, num) == Cell::Type::blue)
+            if (getColor(0, num) == Color::blue)
                 startCoordsList.pushBack(new CellCoords{0, num, CellCoords::Direction::left});
         }
         return algorithm(startCoordsList, path);
@@ -163,7 +163,7 @@ namespace board {
     bool Board::canWinInNMovesWithNaive(size_t n, bool movesFirst, const Board::DistancesType &distancesToFirstBorder,
                                         const Board::DistancesType &distancesToSecondBorder) {
         size_t neededEmptyCells = movesFirst ? 2 * n - 1 : 2 * n;
-        if (neededEmptyCells > getColorCount(Cell::Type::empty) || !isBoardCorrect())
+        if (neededEmptyCells > getColorCount(Color::empty) || !isBoardCorrect())
             return false;
         List<CellCoords *> emptyCells;
         fillEmptyCells(emptyCells);
@@ -225,7 +225,7 @@ namespace board {
         }
         bool movesFirst = mRedCellsCount == mBlueCellsCount;
         MinMax minMax(*this, distancesKeeper, mBfsForRed, mBfsForBlue);
-        return canWinInNMovesWithPerfect(n, movesFirst, Cell::Type::red, Cell::Type::blue, minMax,
+        return canWinInNMovesWithPerfect(n, movesFirst, Color::red, Color::blue, minMax,
                                          distancesKeeper.getDistancesToLeftBorder(),
                                          distancesKeeper.getDistancesToRightBorder(),
                                          distancesKeeper.getDistancesToTopBorder(),
@@ -239,21 +239,21 @@ namespace board {
         }
         bool movesFirst = mRedCellsCount > mBlueCellsCount;
         MinMax minMax(*this, distancesKeeper, mBfsForRed, mBfsForBlue);
-        return canWinInNMovesWithPerfect(n, movesFirst, Cell::Type::blue, Cell::Type::red, minMax,
+        return canWinInNMovesWithPerfect(n, movesFirst, Color::blue, Color::red, minMax,
                                          distancesKeeper.getDistancesToTopBorder(),
                                          distancesKeeper.getDistancesToBottomBorder(),
                                          distancesKeeper.getDistancesToLeftBorder(),
                                          distancesKeeper.getDistancesToRightBorder());
     }
 
-    bool Board::canWinInNMovesWithPerfect(size_t n, bool movesFirst, Cell::Type playerColor, Cell::Type opponentColor,
+    bool Board::canWinInNMovesWithPerfect(size_t n, bool movesFirst, Color playerColor, Color opponentColor,
                                           algorithms::MinMax &minMax,
                                           const Board::DistancesType &playerDistances1,
                                           const Board::DistancesType &playerDistances2,
                                           const Board::DistancesType &opponentDistances1,
                                           const Board::DistancesType &opponentDistances2) {
         size_t neededSteps = movesFirst ? 2 * n - 1 : 2 * n;
-        if (neededSteps > getColorCount(Cell::Type::empty) || !isBoardCorrect()) {
+        if (neededSteps > getColorCount(Color::empty) || !isBoardCorrect()) {
             return false;
         }
         List<CellCoords> playerPossibleMoves;
@@ -275,35 +275,34 @@ namespace board {
         }
     }
 
-    void Board::setType(size_t row, size_t num, CellType type) {
-        if (getType(row, num) != Cell::Type::empty)
-            decColorCount(getType(row, num));
-        if (type != Cell::Type::empty)
-            incColorCount(type);
+    void Board::setColor(size_t row, size_t num, board::Color color) {
+        if (getColor(row, num) != Color::empty)
+            decColorCount(getColor(row, num));
+        if (color != Color::empty)
+            incColorCount(color);
 
-        mBoard[row][num].setType(type);
+        mBoard[row][num] = color;
     }
 
-    void Board::incColorCount(Cell::Type color) {
+    void Board::incColorCount(board::Color color) {
         switch (color) {
-            case Cell::Type::red:
+            case Color::red:
                 ++mRedCellsCount;
                 return;
-            case Cell::Type::blue:
+            case Color::blue:
                 ++mBlueCellsCount;
                 return;
             default:
                 throw std::invalid_argument("Try to increment count of not allowed type of cell!");
         }
-
     }
 
-    void Board::decColorCount(Cell::Type color) {
+    void Board::decColorCount(board::Color color) {
         switch (color) {
-            case Cell::Type::red:
+            case Color::red:
                 --mRedCellsCount;
                 return;
-            case Cell::Type::blue:
+            case Color::blue:
                 --mBlueCellsCount;
                 return;
             default:
@@ -314,7 +313,7 @@ namespace board {
     void Board::fillEmptyCells(List<CellCoords *> &cellList) {
         for (size_t row = 0u; row < size(); ++row) {
             for (size_t num = 0u; num < size(); ++num) {
-                if (mBoard[row][num].getType() == Cell::Type::empty) {
+                if (mBoard[row][num] == Color::empty) {
                     cellList.pushBack(new CellCoords{row, num});
                 }
             }
@@ -326,7 +325,7 @@ namespace board {
         bool canAddIdleCell = maxDistance > 1;
         for (size_t row = 0u; row < size(); ++row) {
             for (size_t num = 0u; num < size(); ++num) {
-                if (mBoard[row][num].getType() == Cell::Type::empty) {
+                if (mBoard[row][num] == Color::empty) {
                     if (playerDistances1[row][num] <= maxDistance && playerDistances2[row][num] <= maxDistance) {
                         cellList.pushBack({row, num});
                         continue;
@@ -350,7 +349,7 @@ namespace board {
         bool canAddIdleCell = opponentMaxDistance > 1;
         for (int row = size() - 1; row >= 0; --row) {
             for (int num = size() - 1; num >= 0; --num) {
-                if (mBoard[row][num].getType() == Cell::Type::empty) {
+                if (mBoard[row][num] == Color::empty) {
                     if (((playerDistances1[row][num] <= playerMaxDistance &&
                           playerDistances2[row][num] <= playerMaxDistance) ||
                          (opponentDistances1[row][num] <= opponentMaxDistance &&

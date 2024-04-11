@@ -22,16 +22,16 @@ namespace board {
         auto num = cellCoords->num;
         if (cellCoords->direction != CellCoords::Direction::left &&
             cellCoords->direction != CellCoords::Direction::down) {
-            addNeighbourAboveLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+            addNeighbourAboveLeft(row, num, Color::red, neighbours, visited, emptyAllowed);
         }
-        addNeighbourAbove(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourRight(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourBelowRight(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourBelow(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+        addNeighbourAbove(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourRight(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourBelowRight(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourBelow(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourLeft(row, num, Color::red, neighbours, visited, emptyAllowed);
         if (cellCoords->direction == CellCoords::Direction::left ||
             cellCoords->direction == CellCoords::Direction::down) {
-            addNeighbourAboveLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+            addNeighbourAboveLeft(row, num, Color::red, neighbours, visited, emptyAllowed);
         }
     }
 
@@ -41,16 +41,16 @@ namespace board {
         auto num = cellCoords->num;
         if (cellCoords->direction != CellCoords::Direction::up &&
             cellCoords->direction != CellCoords::Direction::right) {
-            addNeighbourAboveLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+            addNeighbourAboveLeft(row, num, Color::blue, neighbours, visited, emptyAllowed);
         }
-        addNeighbourLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourBelow(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourBelowRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourAbove(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourLeft(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourBelow(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourBelowRight(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourRight(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourAbove(row, num, Color::blue, neighbours, visited, emptyAllowed);
         if (cellCoords->direction == CellCoords::Direction::up ||
             cellCoords->direction == CellCoords::Direction::right) {
-            addNeighbourAboveLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+            addNeighbourAboveLeft(row, num, Color::blue, neighbours, visited, emptyAllowed);
         }
     }
 
@@ -58,24 +58,24 @@ namespace board {
                                           const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
         auto row = cellCoords->row;
         auto num = cellCoords->num;
-        addNeighbourRight(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourBelowRight(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourBelow(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourAbove(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourAboveLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
-        addNeighbourLeft(row, num, Cell::Type::red, neighbours, visited, emptyAllowed);
+        addNeighbourRight(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourBelowRight(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourBelow(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourAbove(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourAboveLeft(row, num, Color::red, neighbours, visited, emptyAllowed);
+        addNeighbourLeft(row, num, Color::red, neighbours, visited, emptyAllowed);
     }
 
     void BlueStraightNeighbourHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                            const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
         auto row = cellCoords->row;
         auto num = cellCoords->num;
-        addNeighbourBelow(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourBelowRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourRight(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourAboveLeft(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
-        addNeighbourAbove(row, num, Cell::Type::blue, neighbours, visited, emptyAllowed);
+        addNeighbourBelow(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourBelowRight(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourRight(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourLeft(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourAboveLeft(row, num, Color::blue, neighbours, visited, emptyAllowed);
+        addNeighbourAbove(row, num, Color::blue, neighbours, visited, emptyAllowed);
 
     }
 
@@ -91,7 +91,7 @@ namespace board {
         addNeighbourLeft(row, num, mColor, neighbours, visited, emptyAllowed);
     }
 
-    void NeighboursHelper::addNeighbourBelow(size_t row, size_t num, Cell::Type color, List<CellCoords *> &neighbours,
+    void NeighboursHelper::addNeighbourBelow(size_t row, size_t num, Color color, List<CellCoords *> &neighbours,
                                              const VisitedType *visited, bool emptyAllowed) const {
         if (row < mBoard.size() - 1) {
             addToListIfNotVisited(row + 1, num, CellCoords::Direction::down, row, num, neighbours, visited, color,
@@ -99,7 +99,7 @@ namespace board {
         }
     }
 
-    void NeighboursHelper::addNeighbourAbove(size_t row, size_t num, Cell::Type color, List<CellCoords *> &neighbours,
+    void NeighboursHelper::addNeighbourAbove(size_t row, size_t num, Color color, List<CellCoords *> &neighbours,
                                              const VisitedType *visited, bool emptyAllowed) const {
         if (row > 0) {
             addToListIfNotVisited(row - 1, num, CellCoords::Direction::up, row, num, neighbours, visited, color,
@@ -108,7 +108,7 @@ namespace board {
     }
 
     void
-    NeighboursHelper::addNeighbourAboveLeft(size_t row, size_t num, Cell::Type color, List<CellCoords *> &neighbours,
+    NeighboursHelper::addNeighbourAboveLeft(size_t row, size_t num, Color color, List<CellCoords *> &neighbours,
                                             const VisitedType *visited, bool emptyAllowed) const {
         if (row > 0 && num > 0) {
             addToListIfNotVisited(row - 1, num - 1, CellCoords::Direction::upLeft, row, num, neighbours, visited, color,
@@ -117,7 +117,7 @@ namespace board {
     }
 
     void
-    NeighboursHelper::addNeighbourBelowRight(size_t row, size_t num, Cell::Type color, List<CellCoords *> &neighbours,
+    NeighboursHelper::addNeighbourBelowRight(size_t row, size_t num, Color color, List<CellCoords *> &neighbours,
                                              const VisitedType *visited, bool emptyAllowed) const {
         if (row < mBoard.size() - 1 && num < mBoard.size() - 1) {
             addToListIfNotVisited(row + 1, num + 1, CellCoords::Direction::downRight, row, num, neighbours, visited,
@@ -125,7 +125,7 @@ namespace board {
         }
     }
 
-    void NeighboursHelper::addNeighbourLeft(size_t row, size_t num, Cell::Type color, List<CellCoords *> &neighbours,
+    void NeighboursHelper::addNeighbourLeft(size_t row, size_t num, Color color, List<CellCoords *> &neighbours,
                                             const VisitedType *visited, bool emptyAllowed) const {
         if (num > 0) {
             addToListIfNotVisited(row, num - 1, CellCoords::Direction::left, row, num, neighbours, visited, color,
@@ -133,7 +133,7 @@ namespace board {
         }
     }
 
-    void NeighboursHelper::addNeighbourRight(size_t row, size_t num, Cell::Type color, List<CellCoords *> &neighbours,
+    void NeighboursHelper::addNeighbourRight(size_t row, size_t num, Color color, List<CellCoords *> &neighbours,
                                              const VisitedType *visited, bool emptyAllowed) const {
         if (num < mBoard.size() - 1) {
             addToListIfNotVisited(row, num + 1, CellCoords::Direction::right, row, num, neighbours, visited, color,
@@ -143,9 +143,9 @@ namespace board {
 
     void NeighboursHelper::addToListIfNotVisited(
             size_t row, size_t num, CellCoords::Direction direction, size_t parentRow, size_t parentNum,
-            List<CellCoords *> &list, const VisitedType *visited, Cell::Type color, bool emptyAllowed) const {
+            List<CellCoords *> &list, const VisitedType *visited, Color color, bool emptyAllowed) const {
         if (!(*visited)[row][num]) {
-            if (mBoard.getType(row, num) == color || (emptyAllowed && mBoard.getType(row, num) == Cell::Type::empty)) {
+            if (mBoard.getColor(row, num) == color || (emptyAllowed && mBoard.getColor(row, num) == Color::empty)) {
                 list.pushBack(new CellCoords{row, num, direction});
             }
         }
@@ -153,7 +153,7 @@ namespace board {
 
     void EmptyNeighbourHelper::addToListIfNotVisited(
             size_t row, size_t num, CellCoords::Direction direction, size_t parentRow, size_t parentNum,
-            List<CellCoords *> &list, const VisitedType *visited, Cell::Type color,
+            List<CellCoords *> &list, const VisitedType *visited, Color color,
             bool emptyAllowed) const {
         if (mDistanceUpdater.shouldVisit(row, num, parentRow, parentNum)) {
             list.pushBack(new CellCoords{row, num, direction});
@@ -162,16 +162,16 @@ namespace board {
     }
 
     void DistanceUpdater::updateDistance(size_t row, size_t num, size_t parentRow, size_t parentNum) const {
-        size_t distance = mBoard.getType(row, num) == Cell::Type::empty ? mDistances[parentRow][parentNum] + 1
-                                                                        : mDistances[parentRow][parentNum];
+        size_t distance = mBoard.getColor(row, num) == Color::empty ? mDistances[parentRow][parentNum] + 1
+                                                                    : mDistances[parentRow][parentNum];
         if (distance < mDistances[row][num])
             mDistances[row][num] = distance;
     }
 
     bool DistanceUpdater::shouldVisit(size_t row, size_t num, size_t parentRow, size_t parentNum) const {
-        if (mBoard.getType(row, num) == Cell::Type::empty)
+        if (mBoard.getColor(row, num) == Color::empty)
             return mDistances[parentRow][parentNum] + 1 < mDistances[row][num];
-        if (mBoard.getType(row, num) == mColor)
+        if (mBoard.getColor(row, num) == mColor)
             return mDistances[parentRow][parentNum] < mDistances[row][num];
         return false;
     }

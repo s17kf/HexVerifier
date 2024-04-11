@@ -26,7 +26,7 @@ namespace board::algorithms {
         MinMax(Board &board, const DistancesKeeper &distanceKeeper, const Bfs &bfsForRed, const Bfs &bfsForBlue)
                 : mBoard(board), mDistanceKeeper(distanceKeeper), mBfsForRed(bfsForRed), mBfsForBlue(bfsForBlue) {}
 
-        char evaluate(size_t stepsLeft, PlayerType playerType, Cell::Type playerColor, Cell::Type opponentColor,
+        char evaluate(size_t stepsLeft, PlayerType playerType, Color playerColor, Color opponentColor,
                       const data_structures::List<CellCoords> &cellsToPlayByPlayer,
                       const data_structures::List<CellCoords> &cellsToPlayByOpponent);
 

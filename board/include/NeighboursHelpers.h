@@ -8,6 +8,7 @@
 #include "List.h"
 #include "Vector.h"
 #include "CellCoords.h"
+#include "Color.h"
 
 
 namespace board {
@@ -31,32 +32,32 @@ namespace board {
 
     protected:
         void addNeighbourBelow(
-                size_t row, size_t num, Cell::Type color, data_structures::List<CellCoords *> &neighbours,
+                size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
         void addNeighbourAbove(
-                size_t row, size_t num, Cell::Type color, data_structures::List<CellCoords *> &neighbours,
+                size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
         void addNeighbourAboveLeft(
-                size_t row, size_t num, Cell::Type color, data_structures::List<CellCoords *> &neighbours,
+                size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
         void addNeighbourBelowRight(
-                size_t row, size_t num, Cell::Type color, data_structures::List<CellCoords *> &neighbours,
+                size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
         void addNeighbourLeft(
-                size_t row, size_t num, Cell::Type color, data_structures::List<CellCoords *> &neighbours,
+                size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
         void addNeighbourRight(
-                size_t row, size_t num, Cell::Type color, data_structures::List<CellCoords *> &neighbours,
+                size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
         virtual void addToListIfNotVisited(
                 size_t row, size_t num, CellCoords::Direction direction, size_t parentRow, size_t parentNum,
-                data_structures::List<CellCoords *> &list, const VisitedType *visited, Cell::Type color,
+                data_structures::List<CellCoords *> &list, const VisitedType *visited, Color color,
                 bool emptyAllowed) const;
 
 
@@ -101,7 +102,7 @@ namespace board {
     public:
         typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
 
-        DistanceUpdater(const Board &board, DistancesType &distances, Cell::Type color) :
+        DistanceUpdater(const Board &board, DistancesType &distances, Color color) :
                 mBoard(board), mDistances(distances), mColor(color) {}
 
         void updateDistance(size_t row, size_t num, size_t parentRow, size_t parentNum) const;
@@ -111,14 +112,14 @@ namespace board {
     private:
         const Board &mBoard;
         DistancesType &mDistances;
-        Cell::Type mColor;
+        Color mColor;
     };
 
     class EmptyNeighbourHelper : public NeighboursHelper {
     public:
         typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
 
-        explicit EmptyNeighbourHelper(const Board &board, Cell::Type color, DistancesType &distances) :
+        explicit EmptyNeighbourHelper(const Board &board, Color color, DistancesType &distances) :
                 NeighboursHelper(board),
                 mColor(color),
                 mDistanceUpdater(board, distances, color) {}
@@ -131,12 +132,12 @@ namespace board {
     protected:
         void addToListIfNotVisited(
                 size_t row, size_t num, CellCoords::Direction direction, size_t parentRow, size_t parentNum,
-                data_structures::List<CellCoords *> &list, const VisitedType *visited, Cell::Type color,
+                data_structures::List<CellCoords *> &list, const VisitedType *visited, Color color,
                 bool emptyAllowed) const override;
 
 
     private:
-        Cell::Type mColor;
+        Color mColor;
         DistanceUpdater mDistanceUpdater;
     };
 

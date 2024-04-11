@@ -50,28 +50,28 @@ namespace board::algorithms {
         initDistances(distancesToBottomBorder);
         {
             List<CellCoords *> nexts;
-            fillNextsAndUpdateDistancesInColumn(board, nexts, distancesToLeftBorder, 0, Cell::Type::red);
-            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::red, distancesToLeftBorder);
+            fillNextsAndUpdateDistancesInColumn(board, nexts, distancesToLeftBorder, 0, Color::red);
+            EmptyNeighbourHelper neighbourHelper(board, Color::red, distancesToLeftBorder);
             fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
         {
             List<CellCoords *> nexts;
             fillNextsAndUpdateDistancesInColumn(board, nexts, distancesToRightBorder, board.size() - 1,
-                                                Cell::Type::red);
-            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::red, distancesToRightBorder);
+                                                Color::red);
+            EmptyNeighbourHelper neighbourHelper(board, Color::red, distancesToRightBorder);
             fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
         {
             List<CellCoords *> nexts;
-            fillNextsAndUpdateDistancesInRow(board, nexts, distancesToTopBorder, 0, Cell::Type::blue);
-            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::blue, distancesToTopBorder);
+            fillNextsAndUpdateDistancesInRow(board, nexts, distancesToTopBorder, 0, Color::blue);
+            EmptyNeighbourHelper neighbourHelper(board, Color::blue, distancesToTopBorder);
             fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
         {
             List<CellCoords *> nexts;
             fillNextsAndUpdateDistancesInRow(board, nexts, distancesToBottomBorder, board.size() - 1,
-                                             Cell::Type::blue);
-            EmptyNeighbourHelper neighbourHelper(board, Cell::Type::blue, distancesToBottomBorder);
+                                             Color::blue);
+            EmptyNeighbourHelper neighbourHelper(board, Color::blue, distancesToBottomBorder);
             fillDistancesToOneBorder(board, nexts, neighbourHelper);
         }
     }
@@ -90,14 +90,14 @@ namespace board::algorithms {
     }
 
     void Bfs::fillNextsAndUpdateDistancesInColumn(const Board &board, List<CellCoords *> &nexts,
-                                                  DistancesType &distances, size_t col, Cell::Type color) {
+                                                  DistancesType &distances, size_t col, Color color) {
         for (size_t row = 0u; row < board.size(); ++row) {
-            if (board.getType(row, col) == color) {
+            if (board.getColor(row, col) == color) {
                 distances[row][col] = 0;
                 nexts.pushBack(new CellCoords{row, col});
                 continue;
             }
-            if (board.getType(row, col) == Cell::Type::empty) {
+            if (board.getColor(row, col) == Color::empty) {
                 distances[row][col] = 1;
                 nexts.pushBack(new CellCoords{row, col});
             }
@@ -105,14 +105,14 @@ namespace board::algorithms {
     }
 
     void Bfs::fillNextsAndUpdateDistancesInRow(const Board &board, List<CellCoords *> &nexts,
-                                               Bfs::DistancesType &distances, size_t row, Cell::Type color) {
+                                               Bfs::DistancesType &distances, size_t row, Color color) {
         for (size_t num = 0u; num < board.size(); ++num) {
-            if (board.getType(row, num) == color) {
+            if (board.getColor(row, num) == color) {
                 distances[row][num] = 0;
                 nexts.pushBack(new CellCoords{row, num});
                 continue;
             }
-            if (board.getType(row, num) == Cell::Type::empty) {
+            if (board.getColor(row, num) == Color::empty) {
                 distances[row][num] = 1;
                 nexts.pushBack(new CellCoords{row, num});
             }

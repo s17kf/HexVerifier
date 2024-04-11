@@ -41,16 +41,16 @@ protected:
         }
     }
 
-    void setColor(Board &board, const std::vector<std::pair<size_t, size_t >> &coordinates, board::Cell::Type color) {
+    void setColor(Board &board, const std::vector<std::pair<size_t, size_t >> &coordinates, board::Color color) {
         for (const auto &coords: coordinates) {
-            board.setType(coords.first, coords.second, color);
+            board.setColor(coords.first, coords.second, color);
         }
     }
 
     List<CellCoords *> getStartCoordsForRed(const Board &board) {
         List<CellCoords *> list;
         for (size_t row = 0u; row < board.size(); ++row) {
-            if (board.getType(row, 0) == board::Cell::Type::red) {
+            if (board.getColor(row, 0) == board::Color::red) {
                 list.pushBack(new CellCoords{row, 0});
             }
         }
@@ -60,7 +60,7 @@ protected:
     List<CellCoords *> getStartCoordsForBlue(const Board &board) {
         List<CellCoords *> list;
         for (size_t num = 0u; num < board.size(); ++num) {
-            if (board.getType(0, num) == board::Cell::Type::blue) {
+            if (board.getColor(0, num) == board::Color::blue) {
                 list.pushBack(new CellCoords{0, num});
             }
         }
@@ -122,8 +122,8 @@ TEST_F(BfsTest, fillDistances) {
                                                                    {5, 2},};
     const std::vector<std::pair<size_t, size_t>> blueCoordinates = {{0, 4},
                                                                     {1, 5},};
-    setColor(board, redCoordinates, board::Cell::Type::red);
-    setColor(board, blueCoordinates, board::Cell::Type::blue);
+    setColor(board, redCoordinates, board::Color::red);
+    setColor(board, blueCoordinates, board::Color::blue);
 
     const std::vector<std::vector<size_t>> expectedLeftBorderDistances = {
             {0, 1, 2, 2, SIZE_MAX, SIZE_MAX},
@@ -196,8 +196,8 @@ TEST_F(BfsTest, bfsNoWinner) {
                                                                     {4, 4},
                                                                     {5, 3},
                                                                     {5, 5},};
-    setColor(board, redCoordinates, board::Cell::Type::red);
-    setColor(board, blueCoordinates, board::Cell::Type::blue);
+    setColor(board, redCoordinates, board::Color::red);
+    setColor(board, blueCoordinates, board::Color::blue);
 
     RedStraightNeighbourHelper redStraightNeighbourHelper(board);
     BlueStraightNeighbourHelper blueStraightNeighbourHelper(board);
@@ -239,8 +239,8 @@ TEST_F(BfsTest, bfsRedWin) {
                                                                     {4, 4},
                                                                     {5, 3},
                                                                     {5, 5},};
-    setColor(board, redCoordinates, board::Cell::Type::red);
-    setColor(board, blueCoordinates, board::Cell::Type::blue);
+    setColor(board, redCoordinates, board::Color::red);
+    setColor(board, blueCoordinates, board::Color::blue);
 
     RedStraightNeighbourHelper redStraightNeighbourHelper(board);
     BlueStraightNeighbourHelper blueStraightNeighbourHelper(board);
@@ -280,8 +280,8 @@ TEST_F(BfsTest, bfsBlueWin) {
                                                                     {5, 5},
                                                                     {2, 5},
                                                                     {3, 4},};
-    setColor(board, redCoordinates, board::Cell::Type::red);
-    setColor(board, blueCoordinates, board::Cell::Type::blue);
+    setColor(board, redCoordinates, board::Color::red);
+    setColor(board, blueCoordinates, board::Color::blue);
 
     RedStraightNeighbourHelper redStraightNeighbourHelper(board);
     BlueStraightNeighbourHelper blueStraightNeighbourHelper(board);

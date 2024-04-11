@@ -11,8 +11,8 @@ files_to_cp=(
 
 "board/include/Board.h"
 "board/include/BoardParser.h"
-"board/include/Cell.h"
 "board/include/CellCoords.h"
+"board/include/Color.h"
 "board/include/HexVerifier.h"
 "board/include/DistancesKeeper.h"
 "board/include/DoneVerifiers.h"
@@ -24,7 +24,6 @@ files_to_cp=(
 "board/algorithms/include/WinVerificationAlgorithm.h"
 "board/src/Board.cpp"
 "board/src/BoardParser.cpp"
-"board/src/Cell.cpp"
 "board/src/DistancesKeeper.cpp"
 "board/src/DoneVerifiers.cpp"
 "board/src/HexVerifier.cpp"

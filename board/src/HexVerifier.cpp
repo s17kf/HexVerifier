@@ -20,7 +20,7 @@ namespace board {
             return;
         }
         if (*query == "PAWNS_NUMBER") {
-            auto pawnsNumber = board->getColorCount(Cell::Type::red) + board->getColorCount(Cell::Type::blue);
+            auto pawnsNumber = board->getColorCount(Color::red) + board->getColorCount(Color::blue);
             printf("%lu\n", pawnsNumber);
             return;
         }

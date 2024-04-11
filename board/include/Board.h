@@ -5,7 +5,7 @@
 #ifndef HEX_BOARD_H
 #define HEX_BOARD_H
 
-#include "Cell.h"
+#include "Color.h"
 #include "Vector.h"
 #include "DoneVerifiers.h"
 #include "NeighboursHelpers.h"
@@ -21,8 +21,6 @@ namespace board {
     class Board {
     public:
         typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
-        typedef data_structures::Vector<Cell *> RowType;
-        typedef Cell::Type CellType;
 
         virtual ~Board() = default;
 
@@ -34,7 +32,7 @@ namespace board {
             return mSize;
         }
 
-        [[nodiscard]] size_t getColorCount(Cell::Type color) const;
+        [[nodiscard]] size_t getColorCount(Color color) const;
 
         [[nodiscard]] bool isBoardCorrect() const;
 
@@ -56,16 +54,16 @@ namespace board {
 
         bool canBlueWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper);
 
-        [[nodiscard]] inline Cell::Type getType(size_t row, size_t num) const {
-            return mBoard[row][num].getType();
+        [[nodiscard]] inline Color getColor(size_t row, size_t num) const {
+            return mBoard[row][num];
         }
 
-        void setType(size_t row, size_t num, CellType type);
+        void setColor(size_t row, size_t num, Color color);
 
     private:
-        inline void incColorCount(Cell::Type color);
+        inline void incColorCount(Color color);
 
-        inline void decColorCount(Cell::Type color);
+        inline void decColorCount(Color color);
 
         [[nodiscard]] inline bool isGameWonByRed(const DistancesType &distancesToRightBorder) const;
 
@@ -81,8 +79,8 @@ namespace board {
                 size_t n, bool movesFirst, const DistancesType &distancesToFirstBorder,
                 const DistancesType &distancesToSecondBorder);
 
-        inline bool canWinInNMovesWithPerfect(size_t n, bool movesFirst, Cell::Type playerColor,
-                                              Cell::Type opponentColor, algorithms::MinMax &minMax,
+        inline bool canWinInNMovesWithPerfect(size_t n, bool movesFirst, Color playerColor,
+                                              Color opponentColor, algorithms::MinMax &minMax,
                                               const DistancesType &playerDistances1,
                                               const DistancesType &playerDistances2,
                                               const DistancesType &opponentDistances1,
@@ -105,7 +103,7 @@ namespace board {
         size_t mSize;
         size_t mRedCellsCount;
         size_t mBlueCellsCount;
-        data_structures::Vector<data_structures::Vector<Cell>> mBoard;
+        data_structures::Vector<data_structures::Vector<Color>> mBoard;
         RedDoneVerifier mRedDoneVerifier;
         BlueDoneVerifier mBlueDoneVerifier;
         RedNeighboursHelper mRedNeighboursHelper;
