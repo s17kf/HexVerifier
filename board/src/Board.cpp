@@ -224,31 +224,12 @@ namespace board {
             return false;
         }
         bool movesFirst = mRedCellsCount == mBlueCellsCount;
-        size_t neededSteps = movesFirst ? 2 * n - 1 : 2 * n;
-        if (neededSteps > getColorCount(Cell::Type::empty) || !isBoardCorrect()) {
-            return false;
-        }
         MinMax minMax(*this, distancesKeeper, mBfsForRed, mBfsForBlue);
-        List<CellCoords> playerPossibleMoves;
-        fillEmptyCells(playerPossibleMoves, distancesKeeper.getDistancesToLeftBorder(),
-                       distancesKeeper.getDistancesToRightBorder(), n);
-        if (playerPossibleMoves.size() < neededSteps)
-            return false;
-        List<CellCoords> opponentPossibleMoves;
-        size_t opponentMoves = movesFirst ? n - 1 : n;
-        fillEmptyCells(
-                opponentPossibleMoves, distancesKeeper.getDistancesToTopBorder(),
-                distancesKeeper.getDistancesToBottomBorder(), distancesKeeper.getDistancesToLeftBorder(),
-                distancesKeeper.getDistancesToRightBorder(), opponentMoves, n + 1);
-        if (movesFirst) {
-            return MinMax::WIN_VALUE == minMax.evaluate(
-                    neededSteps, MinMax::PlayerType::max, Cell::Type::red,
-                    Cell::Type::blue, playerPossibleMoves, opponentPossibleMoves);
-        } else {
-            return MinMax::WIN_VALUE == minMax.evaluate(
-                    neededSteps, algorithms::MinMax::PlayerType::min, Cell::Type::blue,
-                    Cell::Type::red, opponentPossibleMoves, playerPossibleMoves);
-        }
+        return canWinInNMovesWithPerfect(n, movesFirst, Cell::Type::red, Cell::Type::blue, minMax,
+                                         distancesKeeper.getDistancesToLeftBorder(),
+                                         distancesKeeper.getDistancesToRightBorder(),
+                                         distancesKeeper.getDistancesToTopBorder(),
+                                         distancesKeeper.getDistancesToBottomBorder());
     }
 
     bool Board::canBlueWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper) {
@@ -257,30 +238,40 @@ namespace board {
             return false;
         }
         bool movesFirst = mRedCellsCount > mBlueCellsCount;
+        MinMax minMax(*this, distancesKeeper, mBfsForRed, mBfsForBlue);
+        return canWinInNMovesWithPerfect(n, movesFirst, Cell::Type::blue, Cell::Type::red, minMax,
+                                         distancesKeeper.getDistancesToTopBorder(),
+                                         distancesKeeper.getDistancesToBottomBorder(),
+                                         distancesKeeper.getDistancesToLeftBorder(),
+                                         distancesKeeper.getDistancesToRightBorder());
+    }
+
+    bool Board::canWinInNMovesWithPerfect(size_t n, bool movesFirst, Cell::Type playerColor, Cell::Type opponentColor,
+                                          algorithms::MinMax &minMax,
+                                          const Board::DistancesType &playerDistances1,
+                                          const Board::DistancesType &playerDistances2,
+                                          const Board::DistancesType &opponentDistances1,
+                                          const Board::DistancesType &opponentDistances2) {
         size_t neededSteps = movesFirst ? 2 * n - 1 : 2 * n;
         if (neededSteps > getColorCount(Cell::Type::empty) || !isBoardCorrect()) {
             return false;
         }
-        MinMax minMax(*this, distancesKeeper, mBfsForRed, mBfsForBlue);
         List<CellCoords> playerPossibleMoves;
-        fillEmptyCells(playerPossibleMoves, distancesKeeper.getDistancesToTopBorder(),
-                       distancesKeeper.getDistancesToBottomBorder(), n);
+        fillEmptyCells(playerPossibleMoves, playerDistances1, playerDistances2, n);
         if (playerPossibleMoves.size() < neededSteps)
             return false;
-        List<CellCoords> opponentPossibleMoves;
         size_t opponentMoves = movesFirst ? n - 1 : n;
-        fillEmptyCells(
-                opponentPossibleMoves, distancesKeeper.getDistancesToLeftBorder(),
-                distancesKeeper.getDistancesToRightBorder(), distancesKeeper.getDistancesToTopBorder(),
-                distancesKeeper.getDistancesToBottomBorder(), opponentMoves, n + 1);
+        List<CellCoords> opponentPossibleMoves;
+        fillEmptyCells(opponentPossibleMoves, playerDistances1, playerDistances2, opponentDistances1,
+                       opponentDistances2, n, opponentMoves);
         if (movesFirst) {
             return MinMax::WIN_VALUE == minMax.evaluate(
-                    neededSteps, MinMax::PlayerType::max, Cell::Type::blue,
-                    Cell::Type::red, playerPossibleMoves, opponentPossibleMoves);
+                    neededSteps, MinMax::PlayerType::max, playerColor, opponentColor,
+                    playerPossibleMoves, opponentPossibleMoves);
         } else {
             return MinMax::WIN_VALUE == minMax.evaluate(
-                    neededSteps, algorithms::MinMax::PlayerType::min, Cell::Type::red,
-                    Cell::Type::blue, opponentPossibleMoves, playerPossibleMoves);
+                    neededSteps, algorithms::MinMax::PlayerType::min, opponentColor, playerColor,
+                    opponentPossibleMoves, playerPossibleMoves);
         }
     }
 
@@ -335,13 +326,13 @@ namespace board {
         bool canAddIdleCell = maxDistance > 1;
         for (size_t row = 0u; row < size(); ++row) {
             for (size_t num = 0u; num < size(); ++num) {
-                if (mBoard[row][num].getType() == Cell::Type::empty){
-                    if(playerDistances1[row][num] <= maxDistance && playerDistances2[row][num] <= maxDistance) {
+                if (mBoard[row][num].getType() == Cell::Type::empty) {
+                    if (playerDistances1[row][num] <= maxDistance && playerDistances2[row][num] <= maxDistance) {
                         cellList.pushBack({row, num});
                         continue;
                     }
-                    if(canAddIdleCell) {
-                        cellList.pushBack({row,num});
+                    if (canAddIdleCell) {
+                        cellList.pushBack({row, num});
                         canAddIdleCell = false;
                     }
                 }
@@ -356,14 +347,21 @@ namespace board {
                                const DistancesType &opponentDistances2,
                                size_t playerMaxDistance,
                                size_t opponentMaxDistance) {
-        for (size_t row = 0u; row < size(); ++row) {
-            for (size_t num = 0u; num < size(); ++num) {
-                if (mBoard[row][num].getType() == Cell::Type::empty &&
-                    ((playerDistances1[row][num] <= playerMaxDistance &&
-                      playerDistances2[row][num] <= playerMaxDistance) ||
-                     (opponentDistances1[row][num] <= opponentMaxDistance &&
-                      opponentDistances2[row][num] <= opponentMaxDistance))) {
-                    cellList.pushBack({row, num});
+        bool canAddIdleCell = opponentMaxDistance > 1;
+        for (int row = size() - 1; row >= 0; --row) {
+            for (int num = size() - 1; num >= 0; --num) {
+                if (mBoard[row][num].getType() == Cell::Type::empty) {
+                    if (((playerDistances1[row][num] <= playerMaxDistance &&
+                          playerDistances2[row][num] <= playerMaxDistance) ||
+                         (opponentDistances1[row][num] <= opponentMaxDistance &&
+                          opponentDistances2[row][num] <= opponentMaxDistance))) {
+                        cellList.pushBack({static_cast<size_t>(row), static_cast<size_t>(num)});
+                        continue;
+                    }
+                    if (canAddIdleCell) {
+                        cellList.pushBack({static_cast<size_t>(row), static_cast<size_t>(num)});
+                        canAddIdleCell = false;
+                    }
                 }
             }
         }

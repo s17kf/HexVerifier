@@ -14,9 +14,9 @@
 
 
 namespace board {
-//    namespace algorithms {
-//        class WinVerificationAlgorithm;
-//    }
+    namespace algorithms {
+        class MinMax;
+    }
 
     class Board {
     public:
@@ -80,6 +80,13 @@ namespace board {
         [[nodiscard]] inline bool canWinInNMovesWithNaive(
                 size_t n, bool movesFirst, const DistancesType &distancesToFirstBorder,
                 const DistancesType &distancesToSecondBorder);
+
+        inline bool canWinInNMovesWithPerfect(size_t n, bool movesFirst, Cell::Type playerColor,
+                                              Cell::Type opponentColor, algorithms::MinMax &minMax,
+                                              const DistancesType &playerDistances1,
+                                              const DistancesType &playerDistances2,
+                                              const DistancesType &opponentDistances1,
+                                              const DistancesType &opponentDistances2);
 
         inline void fillEmptyCells(data_structures::List<CellCoords *> &cellList);
 
