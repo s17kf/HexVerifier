@@ -258,7 +258,7 @@ namespace board {
         }
         List<CellCoords> playerPossibleMoves;
         fillEmptyCells(playerPossibleMoves, playerDistances1, playerDistances2, n);
-        if (playerPossibleMoves.size() < neededSteps)
+        if (playerPossibleMoves.size() < n)
             return false;
         size_t opponentMoves = movesFirst ? n - 1 : n;
         List<CellCoords> opponentPossibleMoves;
@@ -346,14 +346,14 @@ namespace board {
                                const DistancesType &opponentDistances2,
                                size_t playerMaxDistance,
                                size_t opponentMaxDistance) {
-        bool canAddIdleCell = opponentMaxDistance > 1;
+        bool canAddIdleCell = playerMaxDistance > 1;
         for (int row = size() - 1; row >= 0; --row) {
             for (int num = size() - 1; num >= 0; --num) {
                 if (mBoard[row][num] == Color::empty) {
-                    if (((playerDistances1[row][num] <= playerMaxDistance &&
-                          playerDistances2[row][num] <= playerMaxDistance) ||
-                         (opponentDistances1[row][num] <= opponentMaxDistance &&
-                          opponentDistances2[row][num] <= opponentMaxDistance))) {
+                    if ((playerDistances1[row][num] <= playerMaxDistance &&
+                         playerDistances2[row][num] <= playerMaxDistance) ||
+                        (opponentDistances1[row][num] <= opponentMaxDistance &&
+                         opponentDistances2[row][num] <= opponentMaxDistance)) {
                         cellList.pushBack({static_cast<size_t>(row), static_cast<size_t>(num)});
                         continue;
                     }

@@ -10,6 +10,7 @@
 #include "List.h"
 #include "Bfs.h"
 #include "Dfs.h"
+#include "CellCoords.h"
 
 namespace board::algorithms {
 

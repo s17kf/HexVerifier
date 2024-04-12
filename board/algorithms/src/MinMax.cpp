@@ -2,7 +2,6 @@
 // Created by stefan on 10/04/24.
 //
 
-#include <climits>
 #include "MinMax.h"
 #include "Vector.h"
 
@@ -26,14 +25,21 @@ namespace board::algorithms {
             }
             const DistancesType &borderDistances1 =
                     playerColor == Color::red ? mDistanceKeeper.getDistancesToLeftBorder()
-                                                    : mDistanceKeeper.getDistancesToTopBorder();
+                                              : mDistanceKeeper.getDistancesToTopBorder();
             const DistancesType &borderDistances2 =
                     playerColor == Color::red ? mDistanceKeeper.getDistancesToRightBorder()
-                                                    : mDistanceKeeper.getDistancesToBottomBorder();
+                                              : mDistanceKeeper.getDistancesToBottomBorder();
 
-            if (playerType == PlayerType::min && borderDistances1[coords.row][coords.num] == 1 &&
+            if (borderDistances1[coords.row][coords.num] == 1 &&
                 borderDistances2[coords.row][coords.num] == 1) {
-                return LOSE_VALUE;
+                if (playerType == PlayerType::min) {
+                    return LOSE_VALUE;
+                }
+                else {
+                    if (stepsLeft != 1)
+                        continue;
+                    return WIN_VALUE;
+                }
             }
             mBoard.setColor(coords.row, coords.num, playerColor);
             PlayerType opponentType = playerType == PlayerType::min ? PlayerType::max : PlayerType::min;
@@ -46,19 +52,6 @@ namespace board::algorithms {
                 }
             } else { //  playerType == max
                 if (newValue > bestValue) {
-                    if (stepsLeft > 2) {
-                        if (playerColor == Color::red) {
-                            if (mBoard.isGameWonByRed(mBfsForRed)) {
-                                mBoard.setColor(coords.row, coords.num, Color::empty);
-                                continue;
-                            }
-                        } else {
-                            if (mBoard.isGameWonByBlue(mBfsForBlue)) {
-                                mBoard.setColor(coords.row, coords.num, Color::empty);
-                                continue;
-                            }
-                        }
-                    }
                     mBoard.setColor(coords.row, coords.num, Color::empty);
                     return newValue;
                 }
