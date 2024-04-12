@@ -88,17 +88,25 @@ namespace board {
 
         inline void fillEmptyCells(data_structures::List<CellCoords *> &cellList);
 
-        inline void fillEmptyCells(
-                data_structures::List<CellCoords> &cellList, const DistancesType &playerDistances1,
-                const DistancesType &playerDistances2, size_t maxDistance);
+        inline void fillEmptyCellsForPlayer(data_structures::List<CellCoords> &cellList,
+                                            const DistancesType &playerDistances1,
+                                            const DistancesType &playerDistances2,
+                                            size_t maxDistance);
 
-        inline void fillEmptyCells(data_structures::List<CellCoords> &cellList,
-                                   const DistancesType &playerDistances1,
-                                   const DistancesType &playerDistances2,
-                                   const DistancesType &opponentDistances1,
-                                   const DistancesType &opponentDistances2,
-                                   size_t playerMaxDistance,
-                                   size_t opponentMaxDistance);
+        inline void fillEmptyCellsForOpponent(data_structures::List<CellCoords> &cellList,
+                                              const DistancesType &playerDistances1,
+                                              const DistancesType &playerDistances2,
+                                              const DistancesType &opponentDistances1,
+                                              const DistancesType &opponentDistances2,
+                                              size_t playerMaxDistance,
+                                              size_t opponentMaxDistance);
+
+        static inline bool canBeWinningCell(
+                const DistancesType &firstBorderDistances, const DistancesType &secondBorderDistances,
+                size_t maxDistance, size_t row, size_t num) {
+            return firstBorderDistances[row][num] == 1 && secondBorderDistances[row][num] <= maxDistance ||
+                   firstBorderDistances[row][num] <= maxDistance && secondBorderDistances[row][num] == 1;
+        }
 
         size_t mSize;
         size_t mRedCellsCount;

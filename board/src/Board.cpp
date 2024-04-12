@@ -257,13 +257,23 @@ namespace board {
             return false;
         }
         List<CellCoords> playerPossibleMoves;
-        fillEmptyCells(playerPossibleMoves, playerDistances1, playerDistances2, n);
+        fillEmptyCellsForPlayer(playerPossibleMoves, playerDistances1, playerDistances2, n);
         if (playerPossibleMoves.size() < n)
             return false;
+        bool winningCellExists = false;
+        for (const auto &coords: playerPossibleMoves) {
+            if (canBeWinningCell(playerDistances1, playerDistances2, n, coords.row, coords.num)) {
+                winningCellExists = true;
+                break;
+            }
+        }
+        if (!winningCellExists) {
+            return false;
+        }
         size_t opponentMoves = movesFirst ? n - 1 : n;
         List<CellCoords> opponentPossibleMoves;
-        fillEmptyCells(opponentPossibleMoves, playerDistances1, playerDistances2, opponentDistances1,
-                       opponentDistances2, n, opponentMoves);
+        fillEmptyCellsForOpponent(opponentPossibleMoves, playerDistances1, playerDistances2, opponentDistances1,
+                                  opponentDistances2, n, opponentMoves);
         if (movesFirst) {
             return MinMax::WIN_VALUE == minMax.evaluate(
                     neededSteps, MinMax::PlayerType::max, playerColor, opponentColor,
@@ -320,13 +330,15 @@ namespace board {
         }
     }
 
-    void Board::fillEmptyCells(List <CellCoords> &cellList, const DistancesType &playerDistances1,
-                               const DistancesType &playerDistances2, size_t maxDistance) {
+    void Board::fillEmptyCellsForPlayer(data_structures::List<CellCoords> &cellList,
+                                        const DistancesType &playerDistances1,
+                                        const DistancesType &playerDistances2,
+                                        size_t maxDistance) {
         bool canAddIdleCell = maxDistance > 1;
         for (size_t row = 0u; row < size(); ++row) {
             for (size_t num = 0u; num < size(); ++num) {
                 if (mBoard[row][num] == Color::empty) {
-                    if (playerDistances1[row][num] <= maxDistance && playerDistances2[row][num] <= maxDistance) {
+                    if (canBeWinningCell(playerDistances1, playerDistances2, maxDistance, row, num)) {
                         cellList.pushBack({row, num});
                         continue;
                     }
@@ -339,26 +351,26 @@ namespace board {
         }
     }
 
-    void Board::fillEmptyCells(List <CellCoords> &cellList,
-                               const DistancesType &playerDistances1,
-                               const DistancesType &playerDistances2,
-                               const DistancesType &opponentDistances1,
-                               const DistancesType &opponentDistances2,
-                               size_t playerMaxDistance,
-                               size_t opponentMaxDistance) {
+    void Board::fillEmptyCellsForOpponent(data_structures::List<CellCoords> &cellList,
+                                          const DistancesType &playerDistances1,
+                                          const DistancesType &playerDistances2,
+                                          const DistancesType &opponentDistances1,
+                                          const DistancesType &opponentDistances2,
+                                          size_t playerMaxDistance,
+                                          size_t opponentMaxDistance) {
         bool canAddIdleCell = playerMaxDistance > 1;
-        for (int row = size() - 1; row >= 0; --row) {
-            for (int num = size() - 1; num >= 0; --num) {
+        for (size_t row = size(); row > 0;) { // go in opposite direction than for player
+            --row; // not done in loop definition to avoid casting value from int to size_t
+            for (size_t num = size(); num > 0;) {
+                --num; // not done in loop definition - same reason as for row
                 if (mBoard[row][num] == Color::empty) {
-                    if ((playerDistances1[row][num] <= playerMaxDistance &&
-                         playerDistances2[row][num] <= playerMaxDistance) ||
-                        (opponentDistances1[row][num] <= opponentMaxDistance &&
-                         opponentDistances2[row][num] <= opponentMaxDistance)) {
-                        cellList.pushBack({static_cast<size_t>(row), static_cast<size_t>(num)});
+                    if (canBeWinningCell(playerDistances1, playerDistances2, playerMaxDistance, row, num) ||
+                        canBeWinningCell(opponentDistances1, opponentDistances2, opponentMaxDistance, row, num)) {
+                        cellList.pushBack({row, num});
                         continue;
                     }
                     if (canAddIdleCell) {
-                        cellList.pushBack({static_cast<size_t>(row), static_cast<size_t>(num)});
+                        cellList.pushBack({row, num});
                         canAddIdleCell = false;
                     }
                 }
