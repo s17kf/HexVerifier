@@ -86,8 +86,6 @@ namespace board {
                                               const DistancesType &opponentDistances1,
                                               const DistancesType &opponentDistances2);
 
-        inline void fillEmptyCells(data_structures::List<CellCoords *> &cellList);
-
         inline void fillEmptyCellsForPlayer(data_structures::List<CellCoords> &cellList,
                                             const DistancesType &playerDistances1,
                                             const DistancesType &playerDistances2,
@@ -100,6 +98,19 @@ namespace board {
                                               const DistancesType &opponentDistances2,
                                               size_t playerMaxDistance,
                                               size_t opponentMaxDistance);
+
+        static inline bool isOneMoveWinningCell(
+                const DistancesType &firstBorderDistances, const DistancesType &secondBorderDistances,
+                size_t row, size_t num) {
+            return firstBorderDistances[row][num] == 1 && secondBorderDistances[row][num] == 1;
+        }
+
+        static inline bool isTwoMovesWinningCell(
+                const DistancesType &firstBorderDistances, const DistancesType &secondBorderDistances,
+                size_t row, size_t num) {
+            return firstBorderDistances[row][num] == 1 && secondBorderDistances[row][num] == 2 ||
+                   firstBorderDistances[row][num] == 2 && secondBorderDistances[row][num] == 1;
+        }
 
         static inline bool canBeWinningCell(
                 const DistancesType &firstBorderDistances, const DistancesType &secondBorderDistances,

@@ -165,57 +165,35 @@ namespace board {
         size_t neededEmptyCells = movesFirst ? 2 * n - 1 : 2 * n;
         if (neededEmptyCells > getColorCount(Color::empty) || !isBoardCorrect())
             return false;
-        List<CellCoords *> emptyCells;
-        fillEmptyCells(emptyCells);
+        List<CellCoords> playerPossibleMoves;
+        fillEmptyCellsForPlayer(playerPossibleMoves, distancesToFirstBorder, distancesToSecondBorder, n);
+        if (playerPossibleMoves.size() < n)
+            return false;
         if (n == 1) {
-            bool winningCellExist = false;
-            while (!emptyCells.empty()) {
-                auto *coords = emptyCells.popFront();
-                auto &row = coords->row;
-                auto &num = coords->num;
-                if (distancesToFirstBorder[row][num] > 1 || distancesToSecondBorder[row][num] > 1) {
-                    delete coords;
-                    continue;
+            bool winningCellExists = false;
+            for (const auto &coords: playerPossibleMoves) {
+                if (isOneMoveWinningCell(distancesToFirstBorder, distancesToSecondBorder, coords.row, coords.num)) {
+                    winningCellExists = true;
+                    break;
                 }
-                winningCellExist = true;
-                delete coords;
-                break;
             }
-            while (!emptyCells.empty()) {
-                delete emptyCells.popFront();
-            }
-            return winningCellExist;
+            return winningCellExists;
         }
-
-        bool twoMoveWinningCellExist = false;
-        bool oneMoveWiningCellExist = false;
-        bool idleMoveCellToFirstBorderExist = false;
-        bool idleMoveCellToSecondBorderExist = false;
-        while (!emptyCells.empty()) {
-            auto *coords = emptyCells.popFront();
-            auto &row = coords->row;
-            auto &num = coords->num;
-            if (distancesToFirstBorder[row][num] == 1 && distancesToSecondBorder[row][num] == 2) {
-                twoMoveWinningCellExist = true;
-                delete coords;
-                break;
+        bool oneMoveWinningCellExists = false;
+        bool idleMoveExists = false;
+        for (const auto &coords: playerPossibleMoves) {
+            if (isTwoMovesWinningCell(distancesToFirstBorder, distancesToSecondBorder, coords.row, coords.num)) {
+                return true;
             }
-            if (distancesToFirstBorder[row][num] == 1 && distancesToSecondBorder[row][num] == 1) {
-                oneMoveWiningCellExist = true;
+            if (isOneMoveWinningCell(distancesToFirstBorder, distancesToSecondBorder, coords.row, coords.num)) {
+                oneMoveWinningCellExists = true;
+            } else {
+                idleMoveExists = true;
             }
-            if (distancesToFirstBorder[row][num] > 1) {
-                idleMoveCellToFirstBorderExist = true;
-            }
-            if (distancesToSecondBorder[row][num] > 1) {
-                idleMoveCellToSecondBorderExist = true;
-            }
-            delete coords;
+            if (oneMoveWinningCellExists && idleMoveExists)
+                return true;
         }
-        while (!emptyCells.empty()) {
-            delete emptyCells.popFront();
-        }
-        return twoMoveWinningCellExist ||
-               (oneMoveWiningCellExist && (idleMoveCellToFirstBorderExist || idleMoveCellToSecondBorderExist));
+        return false;
     }
 
     bool Board::canRedWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper) {
@@ -317,16 +295,6 @@ namespace board {
                 return;
             default:
                 throw std::invalid_argument("Try to decrement count of not allowed type of cell!");
-        }
-    }
-
-    void Board::fillEmptyCells(List<CellCoords *> &cellList) {
-        for (size_t row = 0u; row < size(); ++row) {
-            for (size_t num = 0u; num < size(); ++num) {
-                if (mBoard[row][num] == Color::empty) {
-                    cellList.pushBack(new CellCoords{row, num});
-                }
-            }
         }
     }
 
