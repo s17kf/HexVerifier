@@ -15,9 +15,11 @@ namespace board {
     class HexVerifier {
     public:
         static void handleInput(utils::InputReader &inputReader);
+
     private:
         static void handleBoard(utils::InputReader &inputReader);
-        static void handleQuery(utils::String *query, Board *board, const DistancesKeeper &distancesKeeper);
+
+        static void handleQuery(utils::String *query, Board *board, DistancesKeeper *&distancesKeeper);
     };
 
 } // board
