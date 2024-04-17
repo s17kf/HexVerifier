@@ -13,7 +13,7 @@ namespace utils {
 
     class InputReaderMock : public InputReader {
     public:
-        MOCK_METHOD(String *, getLine, (), (override));
+        MOCK_METHOD(std::string *, getLine, (), (override));
         MOCK_METHOD(bool, eof, (), (const, override));
     };
 

@@ -17,6 +17,8 @@ using utils::String;
 
 using ::testing::Sequence;
 using ::testing::Return;
+using ::testing::SetArgReferee;
+using ::testing::_;
 
 class BoardParserTest : public ::testing::Test {
 protected:
@@ -36,16 +38,16 @@ TEST_F(BoardParserTest, boardCreationSetsProperCellTypes) {
             {Color::red,   Color::blue,  Color::red,   Color::red},
             {Color::blue,  Color::empty, Color::empty, Color::empty},
     };
-    const std::list<String *> inputLines = {
-            new String("---"),
-            new String("--<   >--"),
-            new String("--< b >-<   >--"),
-            new String("--< r >-< r >-<   >--"),
-            new String("< b >-< b >-<   >-< r >"),
-            new String("--<   >-< r >-< b >--"),
-            new String("--<   >-< r >--"),
-            new String("--<   >--"),
-            new String("---")
+    const std::list<std::string *> inputLines = {
+            new std::string("---"),
+            new std::string("--<   >--"),
+            new std::string("--< b >-<   >--"),
+            new std::string("--< r >-< r >-<   >--"),
+            new std::string("< b >-< b >-<   >-< r >"),
+            new std::string("--<   >-< r >-< b >--"),
+            new std::string("--<   >-< r >--"),
+            new std::string("--<   >--"),
+            new std::string("---")
     };
     Sequence s1;
     for (auto *s: inputLines) {
@@ -79,22 +81,22 @@ TEST_F(BoardParserTest, boardSize7Parse) {
             {Color::blue,  Color::empty, Color::blue,  Color::red,   Color::empty, Color::empty, Color::empty},
             {Color::empty, Color::empty, Color::empty, Color::blue,  Color::red,   Color::blue,  Color::empty},
     };
-    const std::list<String *> inputLines = {
-            new String("---"),
-            new String("--<   >--"),
-            new String("--< b >-< r >--"),
-            new String("--<   >-<   >-<   >--"),
-            new String("--<   >-< b >-<   >-< r >--"),
-            new String("--<   >-< r >-<   >-<   >-<   >--"),
-            new String("--< b >-<   >-< b >-< r >-< r >-< r >--"),
-            new String("<   >-<   >-<   >-< r >-<   >-< r >-< b >"),
-            new String("--<   >-< b >-<   >-<   >-< r >-<   >--"),
-            new String("--<   >-< r >-< b >-<   >-< r >--"),
-            new String("--< b >-<   >-< r >-<   >--"),
-            new String("--< r >-<   >-<   >--"),
-            new String("--< b >-<   >--"),
-            new String("--<   >--"),
-            new String("---")
+    const std::list<std::string *> inputLines = {
+            new std::string("---"),
+            new std::string("--<   >--"),
+            new std::string("--< b >-< r >--"),
+            new std::string("--<   >-<   >-<   >--"),
+            new std::string("--<   >-< b >-<   >-< r >--"),
+            new std::string("--<   >-< r >-<   >-<   >-<   >--"),
+            new std::string("--< b >-<   >-< b >-< r >-< r >-< r >--"),
+            new std::string("<   >-<   >-<   >-< r >-<   >-< r >-< b >"),
+            new std::string("--<   >-< b >-<   >-<   >-< r >-<   >--"),
+            new std::string("--<   >-< r >-< b >-<   >-< r >--"),
+            new std::string("--< b >-<   >-< r >-<   >--"),
+            new std::string("--< r >-<   >-<   >--"),
+            new std::string("--< b >-<   >--"),
+            new std::string("--<   >--"),
+            new std::string("---")
     };
     Sequence s1;
     for (auto *s: inputLines) {

@@ -15,11 +15,16 @@ namespace utils {
     public:
         explicit InputReaderImpl(std::istream &stream = std::cin) : mStream(stream) {}
 
-        bool eof() const override {
+        [[nodiscard]] bool eof() const override {
             return mStream.eof();
         }
 
-        String *getLine() override;
+        std::string *getLine() override {
+            auto *line = new std::string();
+            std::getline(mStream, *line);
+            String::strip(line);
+            return line;
+        }
 
     private:
         std::istream &mStream;

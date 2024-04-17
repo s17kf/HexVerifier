@@ -10,6 +10,7 @@
 
 
 using utils::InputReaderImpl;
+
 class InputReaderImplTest : public ::testing::Test {
 protected:
     InputReaderImplTest() {
@@ -64,9 +65,9 @@ TEST_F(InputReaderImplTest, getlineReturnsStrippedLine) {
     size_t loopCounter = 0;
     for (auto &expectedLine: SAMPLE_FILE_LINES_STRIPPED) {
         ++loopCounter;
-        std::unique_ptr<String> testedLine(inputReader.getLine());
+        std::unique_ptr<std::string> testedLine(inputReader.getLine());
         ASSERT_EQ(0, strcmp(expectedLine.c_str(), testedLine->c_str()))
                                     << "loopCounter=" << loopCounter << ": "
-                                    << "expected: '" << expectedLine << "', tested: '" << testedLine->c_str() << "'";
+                                    << "expected: '" << expectedLine << "', tested: '" << *testedLine << "'";
     }
 }

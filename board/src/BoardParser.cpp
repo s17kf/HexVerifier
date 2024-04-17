@@ -12,18 +12,18 @@ using data_structures::List;
 namespace board {
 
     Board *BoardParser::generateBoard() {
-        String *lastLine = mInputReader.getLine();
+        auto *lastLine = mInputReader.getLine();
         if (*lastLine == BOARD_DELIMITER) {
             delete lastLine;
             lastLine = mInputReader.getLine();
         }
-        List<String *> lines;
+        List<std::string *> lines;
         while (*lastLine != BOARD_DELIMITER) {
             lines.pushBack(lastLine);
             lastLine = mInputReader.getLine();
         }
         delete lastLine;
-        if (lines.size() == 0){
+        if (lines.empty()) {
             return nullptr;
         }
 
@@ -31,8 +31,8 @@ namespace board {
         auto *board = new Board(boardSize);
         auto lineIt = lines.begin();
         for (size_t line = 0u; line < lines.size(); ++line, ++lineIt) {
-            List<String> lineSplitted;
-            (*lineIt)->split(lineSplitted);
+            List<std::string> lineSplitted;
+            String::split(*lineIt, lineSplitted);
             size_t tokenInLine = 0u;
             for (auto &token: lineSplitted) {
                 size_t row = line < boardSize ? line - tokenInLine : boardSize - tokenInLine - 1;

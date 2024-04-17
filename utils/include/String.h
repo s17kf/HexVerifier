@@ -14,56 +14,16 @@ namespace utils {
 
     class String {
     public:
-        String(const String &other);
+        String() = delete;
 
-        explicit String(size_t n);
+        static void rstrip(std::string *str, const std::string &toRemove = " ");
 
-        explicit String(char c);
+        static void lstrip(std::string *str, const std::string &toRemove = " ");
 
-        explicit String(const char *s = nullptr);
+        static void strip(std::string *str, const std::string &toRemove = " ");
 
-        ~String() {
-            delete[] mStr;
-        }
-
-        String &operator=(const String &other);
-
-        [[nodiscard]] constexpr size_t size() const { return mSize; }
-
-        String operator+(const String &other) const;
-
-        String operator+=(const String &other);
-
-        String operator+(int number) const;
-
-        String operator+=(int number);
-
-        [[nodiscard]] inline const char *c_str() const { return mStr; }
-
-        [[nodiscard]] inline char operator[](unsigned int index) { return mStr[index]; }
-
-        [[nodiscard]] inline char last() { return mStr[mSize - 1]; }
-
-        inline bool operator==(const String &other) const { return 0 == strcmp(mStr, other.mStr); }
-
-        inline bool operator==(const char *other) const { return 0 == strcmp(mStr, other); }
-
-        inline bool operator!=(const String &other) const { return !(*this == other); }
-
-        inline bool operator!=(const char *other) const { return !(*this == other); }
-
-        String &rstrip(char c = ' ');
-
-        String &lstrip(char c = ' ');
-
-        String &strip(char c = ' ');
-
-        void split(data_structures::List<String> &result, char delimiter = ' ') const;
-
-    private:
-        size_t mSize;
-        size_t mCapacity;
-        char *mStr;
+        static void split(const std::string *str, data_structures::List<std::string> &result,
+                          const std::string &delimiter = " ");
     };
 
 } // utils

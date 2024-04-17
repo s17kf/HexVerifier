@@ -15,7 +15,7 @@ using data_structures::List;
 
 namespace board {
 
-    void HexVerifier::handleQuery(utils::String *query, Board *board, DistancesKeeper *&distancesKeeper) {
+    void HexVerifier::handleQuery(const std::string *query, Board *board, DistancesKeeper *&distancesKeeper) {
         if (*query == "BOARD_SIZE") {
             printf("%lu\n", board->size());
             return;
@@ -59,22 +59,20 @@ namespace board {
             printf("NO\n");
             return;
         }
-        List<String> splittedQuery;
-        query->split(splittedQuery, '_');
+        List<std::string> splittedQuery;
+        utils::String::split(query, splittedQuery, "_");
         auto wordIt = splittedQuery.begin();
         if (*(wordIt++) != "CAN") {
             printf("%s: query is NOT SUPPORTED!\n", query->c_str());
             return;
         }
-        String &color = *wordIt++;
+        std::string &color = *wordIt++;
         ++wordIt; // skip 'WIN'
         ++wordIt; // skip 'IN'
-        String &movesStr = *wordIt++;
-        int moves;
-        std::from_chars(movesStr.c_str(), movesStr.c_str() + movesStr.size(), moves);
+        int moves = std::stoi(*wordIt++);
         ++wordIt; // skip 'MOVE(S)'
         ++wordIt; // skip 'WITH'
-        String &opponentType = *wordIt;
+        std::string &opponentType = *wordIt;
         if (opponentType == "NAIVE") {
             if (color == "RED") {
                 if (board->canRedWinInNMovesWithNaive(moves, *distancesKeeper))
@@ -83,7 +81,6 @@ namespace board {
                     printf("NO\n");
                 return;
             }
-
             if (color == "BLUE") {
                 if (board->canBlueWinInNMovesWithNaive(moves, *distancesKeeper))
                     printf("YES\n");
@@ -115,16 +112,14 @@ namespace board {
         if (board == nullptr)
             return;
         DistancesKeeper *distancesKeeper = nullptr;
-
-        String *lastLine = inputReader.getLine();
+        std::string *lastLine = inputReader.getLine();
         while (!inputReader.eof() && *lastLine != boardParser.BOARD_DELIMITER) {
-            if (lastLine->size() == 0) {
+            if (lastLine->empty()) {
                 delete lastLine;
                 lastLine = inputReader.getLine();
                 continue;
             }
             handleQuery(lastLine, board, distancesKeeper);
-//            printf("\n");
             delete lastLine;
             lastLine = inputReader.getLine();
         }
@@ -133,7 +128,6 @@ namespace board {
         delete lastLine;
         delete board;
     }
-
 
     void HexVerifier::handleInput(utils::InputReader &inputReader) {
         while (!inputReader.eof()) {

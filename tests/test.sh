@@ -5,9 +5,9 @@ cd "$(dirname "$0")"
 source "common.sh"
 
 test_file_base_names=(
+"isBoardPossible"
 "canWinWithNaive"
 "canWinWithPerfect"
-"isBoardPossible"
 "isGameOver"
 )
 

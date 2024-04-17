@@ -6,11 +6,12 @@
 #define HEX_INPUTREADER_H
 
 #include "String.h"
+#include <string>
 
 namespace utils {
     class InputReader {
     public:
-        virtual String *getLine() = 0;
+        virtual std::string *getLine() = 0;
 
         virtual bool eof() const = 0;
     };

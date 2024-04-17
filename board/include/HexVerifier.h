@@ -19,7 +19,7 @@ namespace board {
     private:
         static void handleBoard(utils::InputReader &inputReader);
 
-        static void handleQuery(utils::String *query, Board *board, DistancesKeeper *&distancesKeeper);
+        static void handleQuery(const std::string *query, Board *board, DistancesKeeper *&distancesKeeper);
     };
 
 } // board
