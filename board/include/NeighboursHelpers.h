@@ -28,27 +28,27 @@ namespace board {
                           const VisitedType *visited, bool emptyAllowed) const = 0;
 
     protected:
-        void addNeighbourBelow(
+        inline void addNeighbourBelow(
                 size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
-        void addNeighbourAbove(
+        inline void addNeighbourAbove(
                 size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
-        void addNeighbourAboveLeft(
+        inline void addNeighbourAboveLeft(
                 size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
-        void addNeighbourBelowRight(
+        inline void addNeighbourBelowRight(
                 size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
-        void addNeighbourLeft(
+        inline void addNeighbourLeft(
                 size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 
-        void addNeighbourRight(
+        inline void addNeighbourRight(
                 size_t row, size_t num, Color color, data_structures::List<CellCoords *> &neighbours,
                 const VisitedType *visited, bool emptyAllowed) const;
 

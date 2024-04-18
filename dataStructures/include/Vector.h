@@ -49,6 +49,8 @@ namespace data_structures {
 
         Vector(const Vector<T> &) = delete;
 
+        Vector<T> &operator=(const Vector<T> &other) = delete;
+
         explicit Vector(size_t size) : mSize(size) {
             data = new T[size]();
         }

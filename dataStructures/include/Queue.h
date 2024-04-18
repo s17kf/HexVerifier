@@ -20,13 +20,13 @@ namespace data_structures {
             return data.popFront();
         }
 
-        [[nodiscard]] constexpr T &front() const {
+        [[nodiscard]] inline T &front() const {
             return data.front();
         }
 
-        [[nodiscard]] constexpr size_t size() const { return data.size(); }
+        [[nodiscard]] inline size_t size() const { return data.size(); }
 
-        [[nodiscard]] constexpr bool empty() const { return data.empty(); }
+        [[nodiscard]] inline bool empty() const { return data.empty(); }
 
         auto begin() const { return data.begin(); }
 

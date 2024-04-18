@@ -11,8 +11,8 @@ namespace board {
 
     void RedNeighboursHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                    const VisitedType *visited, bool emptyAllowed) const {
-        auto row = cellCoords->row;
-        auto num = cellCoords->num;
+        const auto &row = cellCoords->row;
+        const auto &num = cellCoords->num;
         if (cellCoords->direction != CellCoords::Direction::left &&
             cellCoords->direction != CellCoords::Direction::down) {
             addNeighbourAboveLeft(row, num, Color::red, neighbours, visited, emptyAllowed);
@@ -30,8 +30,8 @@ namespace board {
 
     void BlueNeighboursHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                     const VisitedType *visited, bool emptyAllowed) const {
-        auto row = cellCoords->row;
-        auto num = cellCoords->num;
+        const auto &row = cellCoords->row;
+        const auto &num = cellCoords->num;
         if (cellCoords->direction != CellCoords::Direction::up &&
             cellCoords->direction != CellCoords::Direction::right) {
             addNeighbourAboveLeft(row, num, Color::blue, neighbours, visited, emptyAllowed);
@@ -49,8 +49,8 @@ namespace board {
 
     void RedStraightNeighbourHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                           const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
-        auto row = cellCoords->row;
-        auto num = cellCoords->num;
+        const auto &row = cellCoords->row;
+        const auto &num = cellCoords->num;
         addNeighbourRight(row, num, Color::red, neighbours, visited, emptyAllowed);
         addNeighbourBelowRight(row, num, Color::red, neighbours, visited, emptyAllowed);
         addNeighbourBelow(row, num, Color::red, neighbours, visited, emptyAllowed);
@@ -61,8 +61,8 @@ namespace board {
 
     void BlueStraightNeighbourHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                            const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
-        auto row = cellCoords->row;
-        auto num = cellCoords->num;
+        const auto &row = cellCoords->row;
+        const auto &num = cellCoords->num;
         addNeighbourBelow(row, num, Color::blue, neighbours, visited, emptyAllowed);
         addNeighbourBelowRight(row, num, Color::blue, neighbours, visited, emptyAllowed);
         addNeighbourRight(row, num, Color::blue, neighbours, visited, emptyAllowed);
@@ -74,8 +74,8 @@ namespace board {
 
     void EmptyNeighbourHelper::fill(List<CellCoords *> &neighbours, const CellCoords *cellCoords,
                                     const NeighboursHelper::VisitedType *visited, bool emptyAllowed) const {
-        auto row = cellCoords->row;
-        auto num = cellCoords->num;
+        const auto &row = cellCoords->row;
+        const auto &num = cellCoords->num;
         addNeighbourAboveLeft(row, num, mColor, neighbours, visited, emptyAllowed);
         addNeighbourAbove(row, num, mColor, neighbours, visited, emptyAllowed);
         addNeighbourRight(row, num, mColor, neighbours, visited, emptyAllowed);

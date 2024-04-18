@@ -86,6 +86,12 @@ namespace board {
         return false;
     }
 
+    bool Board::isGameWonBySomeone(const DistancesKeeper &distancesKeeper) const {
+        return isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
+               isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder());
+    }
+
+
     bool Board::isGameWonByRed(const WinVerificationAlgorithm &algorithm) const {
         List<CellCoords> path;
         return isGameWonByRed(algorithm, path);
@@ -141,8 +147,7 @@ namespace board {
     }
 
     bool Board::canRedWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper) {
-        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
-            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+        if (isGameWonBySomeone(distancesKeeper)) {
             return false;
         }
         bool movesFirst = mRedCellsCount == mBlueCellsCount;
@@ -151,8 +156,7 @@ namespace board {
     }
 
     bool Board::canBlueWinInNMovesWithNaive(size_t n, const DistancesKeeper &distancesKeeper) {
-        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
-            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+        if (isGameWonBySomeone(distancesKeeper)) {
             return false;
         }
         bool movesFirst = mRedCellsCount > mBlueCellsCount;
@@ -197,8 +201,7 @@ namespace board {
     }
 
     bool Board::canRedWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper) {
-        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
-            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+        if (isGameWonBySomeone(distancesKeeper)) {
             return false;
         }
         bool movesFirst = mRedCellsCount == mBlueCellsCount;
@@ -211,8 +214,7 @@ namespace board {
     }
 
     bool Board::canBlueWinInNMovesWithPerfect(size_t n, const DistancesKeeper &distancesKeeper) {
-        if (isGameWonByRed(distancesKeeper.getDistancesToRightBorder()) ||
-            isGameWonByBlue(distancesKeeper.getDistancesToBottomBorder())) {
+        if (isGameWonBySomeone(distancesKeeper)) {
             return false;
         }
         bool movesFirst = mRedCellsCount > mBlueCellsCount;
@@ -345,6 +347,5 @@ namespace board {
             }
         }
     }
-
 
 } // board

@@ -39,8 +39,6 @@ files_to_cp=(
 "utils/src/String.cpp"
 
 "dataStructures/include/List.h"
-"dataStructures/include/Queue.h"
-"dataStructures/include/Stack.h"
 "dataStructures/include/Vector.h"
 )
 

@@ -69,6 +69,8 @@ namespace board {
 
         [[nodiscard]] inline bool isGameWonByBlue(const DistancesType &distancesTpBottomBorder) const;
 
+        [[nodiscard]] inline bool isGameWonBySomeone(const DistancesKeeper &distancesKeeper) const;
+
         [[nodiscard]] inline bool isGameWonByRed(
                 const algorithms::WinVerificationAlgorithm &algorithm, data_structures::List<CellCoords> &path) const;
 
