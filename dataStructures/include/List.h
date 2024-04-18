@@ -7,7 +7,36 @@
 
 #include <iterator>
 
+#include <list>
+
 namespace data_structures {
+    template<typename T>
+    class List : public std::list<T> {
+    public:
+        void pushBack(const T &data) {
+            std::list<T>::push_back(data);
+        }
+
+        void pushFront(const T &data) {
+            std::list<T>::push_front(data);
+        }
+
+        T popFront() {
+            T data = std::list<T>::front();
+            std::list<T>::pop_front();
+            return data;
+        }
+
+        T popBack() {
+            T data = std::list<T>::back();
+            std::list<T>::pop_back();
+            return data;
+        }
+    };
+//    typedef std::list<T> List<T>;
+}
+
+namespace data_structuresxd {
     template<typename T>
     class List {
         struct Node {
