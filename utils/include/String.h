@@ -16,14 +16,13 @@ namespace utils {
     public:
         String() = delete;
 
-        static void rstrip(std::string *str, const std::string &toRemove = " ");
+        static void rstrip(std::string *str, char toRemove = ' ');
 
-        static void lstrip(std::string *str, const std::string &toRemove = " ");
+        static void lstrip(std::string *str, char toRemove = ' ');
 
-        static void strip(std::string *str, const std::string &toRemove = " ");
+        static void strip(std::string *str, char toRemove = ' ');
 
-        static void split(const std::string *str, data_structures::List<std::string> &result,
-                          const std::string &delimiter = " ");
+        static void split(const std::string *str, data_structures::List<std::string> &result, char delimiter = ' ');
     };
 
 } // utils

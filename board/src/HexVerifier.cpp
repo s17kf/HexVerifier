@@ -60,7 +60,7 @@ namespace board {
             return;
         }
         List<std::string> splittedQuery;
-        utils::String::split(query, splittedQuery, "_");
+        utils::String::split(query, splittedQuery, '_');
         auto wordIt = splittedQuery.begin();
         if (*(wordIt++) != "CAN") {
             printf("%s: query is NOT SUPPORTED!\n", query->c_str());
