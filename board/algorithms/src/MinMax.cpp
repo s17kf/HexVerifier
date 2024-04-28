@@ -8,7 +8,7 @@
 namespace board::algorithms {
     typedef data_structures::Vector<data_structures::Vector<size_t>> DistancesType;
 
-    char MinMax::evaluate(
+    char MinMax::operator()(
             size_t stepsLeft, PlayerType playerType, Color playerColor, Color opponentColor,
             const data_structures::List<CellCoords> &cellsToPlayByPlayer,
             const data_structures::List<CellCoords> &cellsToPlayByOpponent) {
@@ -43,7 +43,7 @@ namespace board::algorithms {
             }
             mBoard.setColor(coords.row, coords.num, playerColor);
             PlayerType opponentType = playerType == PlayerType::min ? PlayerType::max : PlayerType::min;
-            char newValue = evaluate(stepsLeft - 1, opponentType, opponentColor, playerColor,
+            char newValue = (*this)(stepsLeft - 1, opponentType, opponentColor, playerColor,
                                      cellsToPlayByOpponent, cellsToPlayByPlayer);
             if (playerType == PlayerType::min) {
                 if (newValue < bestValue) {

@@ -255,12 +255,12 @@ namespace board {
         fillEmptyCellsForOpponent(opponentPossibleMoves, playerDistances1, playerDistances2, opponentDistances1,
                                   opponentDistances2, n, opponentMoves);
         if (movesFirst) {
-            return MinMax::WIN_VALUE == minMax.evaluate(
+            return MinMax::WIN_VALUE == minMax(
                     neededSteps, MinMax::PlayerType::max, playerColor, opponentColor,
                     playerPossibleMoves, opponentPossibleMoves);
         } else {
-            return MinMax::WIN_VALUE == minMax.evaluate(
-                    neededSteps, algorithms::MinMax::PlayerType::min, opponentColor, playerColor,
+            return MinMax::WIN_VALUE == minMax(
+                    neededSteps, MinMax::PlayerType::min, opponentColor, playerColor,
                     opponentPossibleMoves, playerPossibleMoves);
         }
     }
