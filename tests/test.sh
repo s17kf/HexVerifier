@@ -4,11 +4,25 @@ cd "$(dirname "$0")"
 
 source "common.sh"
 
+#test_file_base_names=(
+#"isBoardPossible"
+#"canWinWithNaive"
+#"canWinWithPerfect"
+#"isGameOver"
+#)
+
 test_file_base_names=(
-"isBoardPossible"
-"canWinWithNaive"
-"canWinWithPerfect"
-"isGameOver"
+"0"
+"1"
+"2"
+"3"
+"4"
+"5"
+"6"
+"7"
+"11"
+"16"
+"21"
 )
 
 cmake --build ../cmake-build-debug --target Hex -j 6
