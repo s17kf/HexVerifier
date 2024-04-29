@@ -4,6 +4,8 @@ cd "$(dirname "$0")"
 
 source "common.sh"
 
+TARGET_NAME="Hex"
+
 #test_file_base_names=(
 #"isBoardPossible"
 #"canWinWithNaive"
@@ -25,7 +27,7 @@ test_file_base_names=(
 "21"
 )
 
-cmake --build ../cmake-build-debug --target Hex -j 6
+cmake --build ../cmake-build-debug --target $TARGET_NAME -j 6
 
 if [[ $# -eq 1 ]] && [[ "$1" == "-v" ]] ; then
   valgrind="valgrind"
@@ -39,7 +41,7 @@ for base_name in "${test_file_base_names[@]}"; do
   echo "================================"
   echo -e "Verify ${WHITE_UNDER}$base_name${NC}:"
   valgrind_output_file="tmp_valgrind.out"
-  time $valgrind ../cmake-build-debug/Hex < "$input_file" > "$output_file" 2> "$valgrind_output_file"
+  time $valgrind ../cmake-build-debug/$TARGET_NAME < "$input_file" > "$output_file" 2> "$valgrind_output_file"
   if ! diff -q "$output_file" "$expected_file" > /dev/null; then
     echo -e "${RED_BG}${WHITE_BOLD}FAILED${NC}: $base_name"
     exit_code=1
