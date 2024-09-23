@@ -1,6 +1,6 @@
 # HexVerifier
 
-HexVerifier is a C++ project (developed for academic purposes as part of the Algorithms and Data Structures course at Gdańsk University of Technology) designed to verify the integrity of hexadecimal data. The repository includes various data structures, utility functions, and tests to ensure robust verification.
+HexVerifier is a C++ project (developed for academic purposes as part of the Algorithms and Data Structures course at Gdańsk University of Technology) designed to analyze given HEX game's board in specific state. The repository includes various data structures, utility functions, and tests to ensure robust verification.
 
 ## Table of Contents
 - Installation
